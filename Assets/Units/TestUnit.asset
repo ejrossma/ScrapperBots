@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 126ebbf2c22c7aa4c841c795c0220f3d, type: 3}
+  m_Name: TestUnit
+  m_EditorClassIdentifier: 
+  unitName: TesterBot
+  unitClass: TestClass
+  LVL: 1
+  HP: 5
+  ATK: 1
+  AMR: 0
+  CRG: 3
+  SPD: 2
+  TRD: 4
+  friendly: 1
