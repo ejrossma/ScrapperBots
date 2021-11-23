@@ -21,4 +21,6 @@ MonoBehaviour:
   CRG: 3
   SPD: 2
   TRD: 4
+  row: 8
+  column: 3
   friendly: 1

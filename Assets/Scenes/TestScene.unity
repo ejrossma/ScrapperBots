@@ -217,7 +217,7 @@ RectTransform:
   - {fileID: 1794336251}
   - {fileID: 214341069}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -253,10 +253,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b5d8cb62c25d9a4bb1ecc1bd43f625e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlackSquare: {fileID: 7843438719263206284, guid: 4a5039610ffbca24bbc6019ed5707833, type: 3}
-  WhiteSquare: {fileID: 1317117845490635035, guid: 09a744b03d4f2984c9f20a434ac00292, type: 3}
+  DarkHex: {fileID: 1317117845490635035, guid: 09a744b03d4f2984c9f20a434ac00292, type: 3}
+  LightHex: {fileID: 7843438719263206284, guid: 4a5039610ffbca24bbc6019ed5707833, type: 3}
   width: 10
   height: 10
+  gm: {fileID: 1917508556}
 --- !u!4 &66819956
 Transform:
   m_ObjectHideFlags: 0
@@ -269,7 +270,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &214341068
 GameObject:
@@ -360,7 +361,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 5.3233166
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -384,7 +385,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 484181505}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.25, y: 4.5, z: -5}
+  m_LocalPosition: {x: 4.25, y: 4.2, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -927,11 +928,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1785003463}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.43, y: 3.68, z: 0}
+  m_LocalPosition: {x: 4.43, y: 3.68, z: 2}
   m_LocalScale: {x: 20, y: 20, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1794336250
 GameObject:

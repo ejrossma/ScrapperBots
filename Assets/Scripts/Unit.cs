@@ -16,5 +16,7 @@ public class Unit : ScriptableObject
     public int SPD; //speed
     public int TRD; //threads
 
+    public float row;
+    public float column;
     public bool friendly; //are they an enemy
 }

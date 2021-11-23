@@ -5,38 +5,29 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-
-    //THIS IS A LIVING DOCUMENT WHICH IS CONSTANTLY CHANGING
-    //PLEASE LEAVE COMMENTS AND UPDATE OTHER GROUPMEMBERS ON PROGRESS :)
-
     //Array holding the current turn order
         //inside the array is a reference to the unit so it can be found on the board
 
     //Combat is handled based on speed/initiative
         //After each character takes their turn it goes to the next round of combat
 
-    //On each turn player can
-        //move or not move
-        //&
-        //attack or use an ability or harvest a fallen enemy or meltdown
-
+    private PositionManager pm = new PositionManager();
+    
+    public Unit ActiveUnit;
     public GameObject BattleCanvas;
     public GameObject Player;
 
-    //Two dimensional array that holds the positions & references to units
+    //Two dimensional array that holds references to the tiles
         //Board Positions can be referenced from 0-9 (0,0 is bottom left & 9,9 is top right)
-        //Store player and enemy units at these positions
-    private Unit[,] currentBoard = new Unit[10,10];
+    public GameObject[,] CurrentBoard = new GameObject[10,10];
 
-    // Start is called before the first frame update
     void Start()
     {
         //Place the player in the bottom left and store them in the currentboard
-        var unit = Instantiate(Player, new Vector3(0, 0, -1), Quaternion.identity);
-        currentBoard[0, 0] = unit.GetComponent<Player>().PlayerUnit;
-
-        //NOW HAVE THE ABILITY TO REFERENCE UNITS BASED ON THEIR LOCATION
-        Debug.Log(currentBoard[0,0].ATK);
+        var tempPos = Player.GetComponent<Player>().PlayerUnit.row;
+        var unit = Instantiate(Player, new Vector3(Player.GetComponent<Player>().PlayerUnit.column * pm.moveModifier, 
+                                                   tempPos - 0.5f, -1), Quaternion.identity);
+        ActiveUnit = Player.GetComponent<Player>().PlayerUnit;
     }
 
     //This is the highest level of abstraction in the project, use functions and other files to handle all tasks
@@ -44,6 +35,14 @@ public class GameManager : MonoBehaviour
     {
         updateStats();
     }
+
+
+
+
+
+
+
+
 
     //CHANGE SO THAT IT UPDATES TO THE CURRENT UNIT AND THAT THE ENEMY ONE UPDATES BASED
     //ON WHO THE PLAYER HAS CLICKED ON
