@@ -22,7 +22,5 @@ public class PositionManager
     public void highlightTilesForMovement(Unit ActiveUnit, GameObject[] CurrentBoard) {
         //access unit speed, position through active unit
 
-
-
     }
 }

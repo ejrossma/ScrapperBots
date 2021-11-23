@@ -321,7 +321,7 @@ GameObject:
   - component: {fileID: 484181506}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1086,8 +1086,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 678ea05d2378c5e45a9c0ff6c8f58495, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ActiveUnit: {fileID: 0}
   BattleCanvas: {fileID: 5113933}
   Player: {fileID: 4963274206262687804, guid: 6d40a2ce5ef1af64cb0d9d2427cfe2ed, type: 3}
+  selectedTile: {fileID: 0}
 --- !u!4 &1917508557
 Transform:
   m_ObjectHideFlags: 0
