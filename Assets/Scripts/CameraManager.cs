@@ -21,6 +21,7 @@ public class CameraManager : MonoBehaviour
         {
             Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition) - dragOrigin;
             transform.position = oldPos + -pos * dragSpeed;
+            transform.position = new Vector3(Mathf.Clamp(transform.position.x, 4, 12), Mathf.Clamp(transform.position.y, 6, 31), 0);
         }
     }
 }
