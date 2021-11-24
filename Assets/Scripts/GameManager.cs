@@ -25,10 +25,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        //Testing for placing the player and setting them as the active unit
-        var tempPos = Player.GetComponent<Player>().PlayerUnit.row;
+
         var unit = Instantiate(Player, new Vector3(Player.GetComponent<Player>().PlayerUnit.column * pm.moveModifier,
-                                                   tempPos - 0.5f, -1), Quaternion.identity);
+                                                   Player.GetComponent<Player>().PlayerUnit.row, -1), Quaternion.identity);
         ActiveUnit = Player.GetComponent<Player>().PlayerUnit;
     }
 
