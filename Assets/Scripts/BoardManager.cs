@@ -53,6 +53,7 @@ public class BoardManager : MonoBehaviour
         foreach(Transform t in selectedTiles)
         {
             t.GetChild(0).gameObject.SetActive(true);
+            t.GetComponent<Tile>().selected = true;
         }
     }
 
@@ -63,7 +64,13 @@ public class BoardManager : MonoBehaviour
             for (int c = 0; c < cols; c++)
             {
                 tiles[r, c].GetChild(0).gameObject.SetActive(false);
+                tiles[r, c].GetComponent<Tile>().selected = false;
             }
         }
+    }
+
+    public bool TileIsMovable(Transform tile)
+    {
+        return tile.GetComponent<Tile>().tileType == TileType.DEFAULT || tile.GetComponent<Tile>().tileType == TileType.MUD || tile.GetComponent<Tile>().tileType == TileType.WATER || tile.GetComponent<Tile>().tileType == TileType.CHARGED_AIR;
     }
 }

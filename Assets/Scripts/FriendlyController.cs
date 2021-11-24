@@ -35,9 +35,9 @@ public class FriendlyController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Tiles")))
             {
-                if(hit.transform.parent.CompareTag("Selected"))
+                if(hit.transform.GetComponentInParent<Tile>().selected)
                 {
-                    MoveToTile(hit.transform.parent.parent.GetComponent<Tile>().position);
+                    MoveToTile(hit.transform.GetComponentInParent<Tile>().position);
                     bm.DeselectTiles();
                     bm.SelectTiles(GetValidMovePositions());
                 }
@@ -82,7 +82,7 @@ public class FriendlyController : MonoBehaviour
         Transform above = bm.GetAdjacentTile((Vector2Int)node, Direction.ABOVE);
 
         // Check if tile is valid
-        if (above != null && above.GetComponent<Tile>().tileType == TileType.DEFAULT)
+        if (above != null && bm.TileIsMovable(above))
         {
             Vector2Int pos = above.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -112,7 +112,7 @@ public class FriendlyController : MonoBehaviour
         Transform upperRight = bm.GetAdjacentTile((Vector2Int)node, Direction.UPPER_RIGHT);
 
         // Check if tile is valid
-        if (upperRight != null && upperRight.GetComponent<Tile>().tileType == TileType.DEFAULT)
+        if (upperRight != null && bm.TileIsMovable(upperRight))
         {
             Vector2Int pos = upperRight.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -142,7 +142,7 @@ public class FriendlyController : MonoBehaviour
         Transform lowerRight = bm.GetAdjacentTile((Vector2Int)node, Direction.LOWER_RIGHT);
 
         // Check if tile is valid
-        if (lowerRight != null && lowerRight.GetComponent<Tile>().tileType == TileType.DEFAULT)
+        if (lowerRight != null && bm.TileIsMovable(lowerRight))
         {
             Vector2Int pos = lowerRight.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -172,7 +172,7 @@ public class FriendlyController : MonoBehaviour
         Transform below = bm.GetAdjacentTile((Vector2Int)node, Direction.BELOW);
 
         // Check if tile is valid
-        if (below != null && below.GetComponent<Tile>().tileType == TileType.DEFAULT)
+        if (below != null && bm.TileIsMovable(below))
         {
             Vector2Int pos = below.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -202,7 +202,7 @@ public class FriendlyController : MonoBehaviour
         Transform lowerLeft = bm.GetAdjacentTile((Vector2Int)node, Direction.LOWER_LEFT);
 
         // Check if tile is valid
-        if (lowerLeft != null && lowerLeft.GetComponent<Tile>().tileType == TileType.DEFAULT)
+        if (lowerLeft != null && bm.TileIsMovable(lowerLeft))
         {
             Vector2Int pos = lowerLeft.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -232,7 +232,7 @@ public class FriendlyController : MonoBehaviour
         Transform upperLeft = bm.GetAdjacentTile((Vector2Int)node, Direction.UPPER_LEFT);
 
         // Check if tile is valid
-        if (upperLeft != null && upperLeft.GetComponent<Tile>().tileType == TileType.DEFAULT)
+        if (upperLeft != null && bm.TileIsMovable(upperLeft))
         {
             Vector2Int pos = upperLeft.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
