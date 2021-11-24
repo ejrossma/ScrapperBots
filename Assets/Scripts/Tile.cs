@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TileType { DEFAULT };
+public enum TileType { DEFAULT, OBSTACLE };
 
 public class Tile : MonoBehaviour
 {

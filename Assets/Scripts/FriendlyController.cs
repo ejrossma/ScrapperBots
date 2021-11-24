@@ -16,14 +16,33 @@ public class FriendlyController : MonoBehaviour
     public int SPD; //speed
     public int TRD; //threads
     public Vector2Int position;
+    public bool isTurn;
 
     private BoardManager bm;
 
     private void Start()
     {
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
-        List<Transform> tiles = GetValidMovePositions();
-        bm.SelectTiles(tiles);
+        bm.SelectTiles(GetValidMovePositions());
+        MoveToTile(position);
+    }
+
+    private void Update()
+    {
+        if (isTurn && Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Tiles")))
+            {
+                if(hit.transform.parent.CompareTag("Selected"))
+                {
+                    MoveToTile(hit.transform.parent.parent.GetComponent<Tile>().position);
+                    bm.DeselectTiles();
+                    bm.SelectTiles(GetValidMovePositions());
+                }
+            }
+        }
     }
 
     public void MoveToTile(Vector2Int pos)
