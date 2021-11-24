@@ -54,47 +54,65 @@ public class Player : MonoBehaviour
     }
 
     bool ValidMove(GameObject destinationTile) {
+        //destination tuple
+        Tuple<int, int> destCoords = new Tuple<int, int>(destinationTile.GetComponent<Coordinates>().x, destinationTile.GetComponent<Coordinates>().y);
         //list of valid moves
         List<Tuple<int, int>> validCoords = new List<Tuple<int, int>>();
-
-        //lowered position
-        if (PlayerUnit.column % 2 != 0) 
-        {
-            Debug.Log("Lowered");
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column, (int) PlayerUnit.row - 1)); //below
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column, (int) PlayerUnit.row + 1)); //above
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column + 1, (int) PlayerUnit.row)); //upper right
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column + 1, (int) PlayerUnit.row - 1)); //lower right
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column - 1, (int) PlayerUnit.row)); //upper left
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column - 1, (int) PlayerUnit.row - 1)); //lower left 
-        } else { //raised position
-            Debug.Log("Raised");
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column, (int) PlayerUnit.row - 1)); //below
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column, (int) PlayerUnit.row + 1)); //above
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column + 1, (int) PlayerUnit.row - 1)); //upper right
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column + 1, (int) PlayerUnit.row)); //lower right
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column - 1, (int) PlayerUnit.row - 1)); //upper left
-            validCoords.Add(new Tuple<int, int>( (int)PlayerUnit.column - 1, (int) PlayerUnit.row)); //lower left
-        }
-        
-        Tuple<int, int> destCoords = new Tuple<int, int>(destinationTile.GetComponent<Coordinates>().x, destinationTile.GetComponent<Coordinates>().y);
-        foreach (var tup in validCoords) {
-            Debug.Log(tup);
-            if (destCoords == tup) 
-            {
-                Debug.Log("Does Equal: " + destCoords);
-                return true;
-            } else {
-                Debug.Log("Doesn't Equal: " + destCoords);
+        //calculate first step from starting spot
+        validCoords = CalculateStep(new Tuple<int, int>( (int)PlayerUnit.column, (int) PlayerUnit.row));
+        //buffer list
+        List<Tuple<int, int>> buf = new List<Tuple<int, int>>();
+        //second buffer
+        List<Tuple<int, int>> temp = new List<Tuple<int, int>>();       
+        //Keep going until either find spot or run out of spd
+        for (int i = 1; i <= PlayerUnit.SPD; i++) {
+            //does it exist
+            foreach (var tup in validCoords) {
+                Debug.Log(tup + " X: " + tup.Item1 + " Y: " + tup.Item2);
+                if (tup.Item1 == destCoords.Item1 && tup.Item2 == destCoords.Item2) {
+                    PlayerUnit.column = tup.Item1; PlayerUnit.row = tup.Item2;
+                    return true;
+                }
+            }
+            //expand if it doesn't currently exist
+            foreach (var tup in validCoords) {
+                //load possibilties into buffer
+                buf = CalculateStep(tup);
+                //move them into temp to ensure foreach loop isn't messed up
+                foreach (var tup2 in buf)
+                    temp.Add(tup2);
+            }
+            //transfer from temp to validcoords
+            foreach (var tup in temp) {
+                validCoords.Add(tup);
             }
         }
-
         return false;
     }
 
     //calculate a single step towards the destination
-    void CalculateStep() 
+    List<Tuple<int, int>> CalculateStep(Tuple<int, int> origin) 
     {
-
+        List<Tuple<int, int>> temp = new List<Tuple<int, int>>();
+        //if its in a lowered column
+        if (origin.Item1 % 2 != 0) 
+        {
+            //lowered
+            temp.Add(new Tuple<int, int>( origin.Item1, origin.Item2 - 1)); //below
+            temp.Add(new Tuple<int, int>( origin.Item1, origin.Item2 + 1)); //above
+            temp.Add(new Tuple<int, int>( origin.Item1 + 1, origin.Item2)); //upper right
+            temp.Add(new Tuple<int, int>( origin.Item1 + 1, origin.Item2 - 1)); //lower right
+            temp.Add(new Tuple<int, int>( origin.Item1 - 1, origin.Item2)); //upper left
+            temp.Add(new Tuple<int, int>( origin.Item1 - 1, origin.Item2 - 1)); //lower left 
+        } else {
+            //raised
+            temp.Add(new Tuple<int, int>( origin.Item1, origin.Item2 - 1)); //below
+            temp.Add(new Tuple<int, int>( origin.Item1, origin.Item2 + 1)); //above
+            temp.Add(new Tuple<int, int>( origin.Item1 + 1, origin.Item2 + 1)); //upper right
+            temp.Add(new Tuple<int, int>( origin.Item1 + 1, origin.Item2)); //lower right
+            temp.Add(new Tuple<int, int>( origin.Item1 - 1, origin.Item2 + 1)); //upper left
+            temp.Add(new Tuple<int, int>( origin.Item1 - 1, origin.Item2)); //lower left
+        }
+        return temp;
     }
 }
