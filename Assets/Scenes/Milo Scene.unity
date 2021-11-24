@@ -266,9 +266,9 @@ MonoBehaviour:
   ATK: 0
   AMR: 0
   CRG: 0
-  SPD: 0
+  SPD: 2
   TRD: 0
-  position: {x: 0, y: 0}
+  position: {x: 2, y: 3}
 --- !u!1 &286348735
 GameObject:
   m_ObjectHideFlags: 0

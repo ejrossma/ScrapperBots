@@ -10,7 +10,7 @@ public class BoardManager : MonoBehaviour
     private int cols;
     private Transform[,] tiles;
 
-    private void Start()
+    private void Awake()
     {
         rows = transform.childCount;
         cols = transform.GetChild(0).childCount;
@@ -20,6 +20,7 @@ public class BoardManager : MonoBehaviour
             for (int c = 0; c < cols; c++)
             {
                 tiles[r, c] = transform.GetChild(r).GetChild(c);
+                tiles[r, c].GetComponent<Tile>().position = new Vector2Int(c, r);
             }
         }
     }
@@ -45,5 +46,24 @@ public class BoardManager : MonoBehaviour
             Direction.UPPER_LEFT => GetTile(new Vector2Int(position.x - 1, position.x % 2 == 0 ? position.y - 1 : position.y)),
             _ => null
         };
+    }
+
+    public void SelectTiles(List<Transform> selectedTiles)
+    {
+        foreach(Transform t in selectedTiles)
+        {
+            t.GetChild(0).gameObject.SetActive(true);
+        }
+    }
+
+    public void DeselectTiles()
+    {
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                tiles[r, c].GetChild(0).gameObject.SetActive(false);
+            }
+        }
     }
 }
