@@ -19,6 +19,7 @@ public class HideDetailedStatsScript : MonoBehaviour
         var getCanvasGroup = panelGroup.GetComponent<CanvasGroup>();
 
         //if the canvass group is hidden, reveal it and make it interactable
+        /*
         if (getCanvasGroup.alpha == 0)
         {
             getCanvasGroup.alpha = 1;
@@ -32,5 +33,24 @@ public class HideDetailedStatsScript : MonoBehaviour
             getCanvasGroup.alpha = 0;
             getCanvasGroup.interactable = false;
         }
+        */
+
+        //get the position
+        var ypos = getCanvasGroup.transform.position.y;
+
+        var viewable = 0f;
+        var hidden = 0f;
+
+        //if the panel is in the viewable position, move it off the screen
+        if (ypos > viewable)
+        {
+            getCanvasGroup.transform.Translate(0f, -300f, 0f);
+        }
+        //else move it onto the screen
+        else if (ypos < hidden)
+        {
+            getCanvasGroup.transform.Translate(0f, 300f, 0f);
+        }
+
     }
 }
