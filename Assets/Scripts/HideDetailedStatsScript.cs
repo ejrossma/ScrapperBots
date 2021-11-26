@@ -44,12 +44,12 @@ public class HideDetailedStatsScript : MonoBehaviour
         //if the panel is in the viewable position, move it off the screen
         if (ypos > viewable)
         {
-            getCanvasGroup.transform.Translate(0f, -300f, 0f);
+            getCanvasGroup.transform.Translate(0f, -130f, 0f);
         }
         //else move it onto the screen
         else if (ypos < hidden)
         {
-            getCanvasGroup.transform.Translate(0f, 300f, 0f);
+            getCanvasGroup.transform.Translate(0f, 130f, 0f);
         }
 
     }
