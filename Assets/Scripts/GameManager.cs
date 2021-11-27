@@ -25,9 +25,14 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-
+        if (Player.GetComponent<Player>().PlayerUnit.column % 2 == 0) {
         var unit = Instantiate(Player, new Vector3(Player.GetComponent<Player>().PlayerUnit.column * pm.moveModifier,
                                                    Player.GetComponent<Player>().PlayerUnit.row, -1), Quaternion.identity);
+        } else {
+        var unit = Instantiate(Player, new Vector3(Player.GetComponent<Player>().PlayerUnit.column * pm.moveModifier,
+                                                   Player.GetComponent<Player>().PlayerUnit.row - 0.5f, -1), Quaternion.identity);
+        }
+
         ActiveUnit = Player.GetComponent<Player>().PlayerUnit;
     }
 

@@ -15,6 +15,10 @@ public class Player : MonoBehaviour
     private bool active;
     public Unit PlayerUnit;
 
+    private bool generatedMovement;
+
+    public List<Tuple<int, int>> validCoords = new List<Tuple<int, int>>();
+
 
     //On each turn player can
         //move or not move
@@ -36,6 +40,12 @@ public class Player : MonoBehaviour
         {
             active = true;
         }
+        if (!generatedMovement) {
+            ValidMove(gm.CurrentBoard[(int)PlayerUnit.column, (int)PlayerUnit.row]);
+            AdjustIndicators();
+        }
+            
+
         //raycast to select a tile
         RaycastAndSelectTile();
     }
@@ -48,16 +58,20 @@ public class Player : MonoBehaviour
             gm.selectedTile = hit.transform.gameObject;
             Debug.Log("Player's Current Position: (" + PlayerUnit.column + ", " + PlayerUnit.row + ")");
             Debug.Log("Player's Destination: (" + gm.selectedTile.GetComponent<Coordinates>().x + ", " + gm.selectedTile.GetComponent<Coordinates>().y + ")");
-            if (ValidMove(gm.selectedTile))
+            Tuple<int, int> dest = new Tuple<int, int>(gm.selectedTile.GetComponent<Coordinates>().x, gm.selectedTile.GetComponent<Coordinates>().y);
+            if (validCoords.Contains(dest)) { //change to if move in validCoords
                 transform.position = hit.transform.position;
+                PlayerUnit.column = dest.Item1; PlayerUnit.row = dest.Item2;
+                generatedMovement = false;
+            }
         }
     }
 
-    bool ValidMove(GameObject destinationTile) {
+    void ValidMove(GameObject destinationTile) {
+        //to ensure no reentering this function
+        generatedMovement = true;
         //destination tuple
         Tuple<int, int> destCoords = new Tuple<int, int>(destinationTile.GetComponent<Coordinates>().x, destinationTile.GetComponent<Coordinates>().y);
-        //list of valid moves
-        List<Tuple<int, int>> validCoords = new List<Tuple<int, int>>();
         //calculate first step from starting spot
         validCoords = CalculateStep(new Tuple<int, int>( (int)PlayerUnit.column, (int) PlayerUnit.row));
         //buffer list
@@ -65,16 +79,8 @@ public class Player : MonoBehaviour
         //second buffer
         List<Tuple<int, int>> temp = new List<Tuple<int, int>>();       
         //Keep going until either find spot or run out of spd
-        for (int i = 1; i <= PlayerUnit.SPD; i++) {
-            //does it exist
-            foreach (var tup in validCoords) {
-                Debug.Log(tup + " X: " + tup.Item1 + " Y: " + tup.Item2);
-                if (tup.Item1 == destCoords.Item1 && tup.Item2 == destCoords.Item2) {
-                    PlayerUnit.column = tup.Item1; PlayerUnit.row = tup.Item2;
-                    return true;
-                }
-            }
-            //expand if it doesn't currently exist
+        for (int i = 1; i < PlayerUnit.SPD; i++) {
+            //expand
             foreach (var tup in validCoords) {
                 //load possibilties into buffer
                 buf = CalculateStep(tup);
@@ -87,7 +93,6 @@ public class Player : MonoBehaviour
                 validCoords.Add(tup);
             }
         }
-        return false;
     }
 
     //calculate a single step towards the destination
@@ -115,4 +120,19 @@ public class Player : MonoBehaviour
         }
         return temp;
     }
+
+    void AdjustIndicators() {
+        //clear all indicators
+        foreach (var tile in gm.CurrentBoard) {
+            tile.GetComponent<Coordinates>().Indicator.SetActive(false);
+        }
+        //generate indicators
+        foreach (var coord in validCoords) {
+            if ((coord.Item1 > -1 && coord.Item2 < 10) && (coord.Item2 > -1 && coord.Item2 < 10)) {
+                GameObject temp = gm.CurrentBoard[coord.Item1, coord.Item2];
+                temp.GetComponent<Coordinates>().Indicator.SetActive(true);
+            }
+        }
+    }
+
 }
