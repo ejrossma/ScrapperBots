@@ -6,4 +6,6 @@ public class Coordinates : MonoBehaviour
 {
     public int x;
     public int y;
+
+    public GameObject Indicator;
 }
