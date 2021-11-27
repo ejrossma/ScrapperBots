@@ -5,7 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Board
-  - Unit
+  - Friendly Unit
+  - Enemy Unit
   layers:
   - Default
   - TransparentFX

@@ -253,8 +253,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b5d8cb62c25d9a4bb1ecc1bd43f625e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DarkHex: {fileID: 1317117845490635035, guid: 09a744b03d4f2984c9f20a434ac00292, type: 3}
-  LightHex: {fileID: 7843438719263206284, guid: 4a5039610ffbca24bbc6019ed5707833, type: 3}
+  Hex: {fileID: 7843438719263206284, guid: 4a5039610ffbca24bbc6019ed5707833, type: 3}
+  Light: {r: 0.8, g: 0.69411767, b: 0.5019608, a: 1}
+  Dark: {r: 0.6156863, g: 0.7647059, b: 0.7137255, a: 1}
   width: 10
   height: 10
   gm: {fileID: 1917508556}
