@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum FriendlyUnitClass { BIG_PAL, SCRAPPER, WITCH, ELECTROMANCER };
+public enum EnemyUnitClass { KNIFE, BOMBERMAN, REAVER, SLUGGER, TANK };
 
-public class FriendlyController : MonoBehaviour
+public class EnemyController : MonoBehaviour
 {
     public string unitName;
-    public FriendlyUnitClass unitClass;
+    public EnemyUnitClass unitClass;
     public int LVL; //level
     public int HP; //hit points
     public int ATK; //attack
@@ -27,37 +27,21 @@ public class FriendlyController : MonoBehaviour
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         friendlyUnits = GameObject.FindGameObjectsWithTag("Friendly Unit");
         enemyUnits = GameObject.FindGameObjectsWithTag("Enemy Unit");
-        if (isTurn)
-            bm.SelectTiles(GetValidMovePositions());
-        MoveToTile(position);
     }
 
     private void Update()
     {
-        if (isTurn && Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Tiles")))
-            {
-                if(hit.transform.GetComponentInParent<Tile>().selected)
-                {
-                    MoveToTile(hit.transform.GetComponentInParent<Tile>().position);
-                    bm.DeselectTiles();
-                    bm.SelectTiles(GetValidMovePositions());
-                }
-            }
-        }
+
     }
 
     public void MoveToTile(Vector2Int pos)
     {
         Transform newPos = bm.GetTile(pos);
-        if(newPos != null)
+        if (newPos != null)
         {
             transform.position = newPos.position;
             position = pos;
-        }    
+        }
     }
 
     public List<Transform> GetValidMovePositions()
@@ -69,7 +53,7 @@ public class FriendlyController : MonoBehaviour
 
         List<Transform> tiles = new List<Transform>();
 
-        foreach(Vector3Int v in visited)
+        foreach (Vector3Int v in visited)
         {
             tiles.Add(bm.GetTile((Vector2Int)v));
         }
@@ -92,9 +76,9 @@ public class FriendlyController : MonoBehaviour
             Vector2Int pos = above.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
             bool alreadyInList = false;
-            for(int i = 0; i < visited.Count; i++)
+            for (int i = 0; i < visited.Count; i++)
             {
-                if(visited[i].x == pos.x && visited[i].y == pos.y)
+                if (visited[i].x == pos.x && visited[i].y == pos.y)
                 {
                     if (visited[i].z > node.z + 1)
                     {
@@ -108,7 +92,7 @@ public class FriendlyController : MonoBehaviour
                 }
             }
             // Add tile to visited if not already in list
-            if(!alreadyInList)
+            if (!alreadyInList)
             {
                 VisitTile(visited, new Vector3Int(pos.x, pos.y, node.z + 1));
             }
@@ -267,7 +251,7 @@ public class FriendlyController : MonoBehaviour
 
     private bool TileOccupied(Transform tile)
     {
-        foreach(GameObject unit in friendlyUnits)
+        foreach (GameObject unit in friendlyUnits)
         {
             if (unit.GetComponent<FriendlyController>().position == tile.GetComponent<Tile>().position)
                 return true;
