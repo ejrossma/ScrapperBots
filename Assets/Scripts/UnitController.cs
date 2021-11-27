@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EnemyUnitClass { KNIFE, BOMBERMAN, REAVER, SLUGGER, TANK };
+public enum UnitClass { BIG_PAL, SCRAPPER, WITCH, ELECTROMANCER, KNIFE, BOMBERMAN, REAVER, SLUGGER, TANK };
 
-public class EnemyController : MonoBehaviour
+public class UnitController : MonoBehaviour
 {
     public string unitName;
-    public EnemyUnitClass unitClass;
+    public UnitClass unitClass;
     public int LVL; //level
     public int HP; //hit points
     public int ATK; //attack
@@ -17,21 +17,36 @@ public class EnemyController : MonoBehaviour
     public int TRD; //threads
     public Vector2Int position;
     public bool isTurn;
+    public Sprite icon;
 
     private BoardManager bm;
-    private GameObject[] friendlyUnits;
-    private GameObject[] enemyUnits;
+    private SystemManager sm;
 
     private void Start()
     {
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
-        friendlyUnits = GameObject.FindGameObjectsWithTag("Friendly Unit");
-        enemyUnits = GameObject.FindGameObjectsWithTag("Enemy Unit");
+        sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
+        if (isTurn)
+            bm.SelectTiles(GetValidMovePositions());
+        MoveToTile(position);
     }
 
     private void Update()
     {
-
+        if (isTurn && Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Tiles")))
+            {
+                if (hit.transform.GetComponentInParent<Tile>().selected)
+                {
+                    MoveToTile(hit.transform.GetComponentInParent<Tile>().position);
+                    bm.DeselectTiles();
+                    bm.SelectTiles(GetValidMovePositions());
+                }
+            }
+        }
     }
 
     public void MoveToTile(Vector2Int pos)
@@ -251,14 +266,9 @@ public class EnemyController : MonoBehaviour
 
     private bool TileOccupied(Transform tile)
     {
-        foreach (GameObject unit in friendlyUnits)
+        foreach (GameObject unit in sm.activeUnits)
         {
-            if (unit.GetComponent<FriendlyController>().position == tile.GetComponent<Tile>().position)
-                return true;
-        }
-        foreach (GameObject unit in enemyUnits)
-        {
-            if (unit.GetComponent<EnemyController>().position == tile.GetComponent<Tile>().position)
+            if (unit.GetComponent<UnitController>().position == tile.GetComponent<Tile>().position)
                 return true;
         }
         return false;
