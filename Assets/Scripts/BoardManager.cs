@@ -21,6 +21,10 @@ public class BoardManager : MonoBehaviour
             {
                 tiles[r, c] = transform.GetChild(r).GetChild(c);
                 tiles[r, c].GetComponent<Tile>().position = new Vector2Int(c, r);
+                if(c % 2 == 0)
+                    tiles[r, c].GetComponent<Tile>().nodePosition = new Vector3Int(c, -((c+1) / 2) + r, -(c / 2) - r);
+                else
+                    tiles[r, c].GetComponent<Tile>().nodePosition = new Vector3Int(c, -(c / 2) + r, -((c+1) / 2) - r);
             }
         }
     }

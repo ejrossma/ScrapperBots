@@ -17,6 +17,8 @@ public class UnitController : MonoBehaviour
     public int TRD; //threads
     public Vector2Int position;
     public bool isTurn;
+    public bool alreadyMoved;
+    public bool moveRangeShowing;
     public Sprite icon;
 
     private BoardManager bm;
@@ -26,27 +28,72 @@ public class UnitController : MonoBehaviour
     {
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
-        if (isTurn)
-            bm.SelectTiles(GetValidMovePositions());
         MoveToTile(position);
+        if (true)
+        {
+            List<Transform> a = PathfindToTile(new Vector2Int(0, 0));
+            Debug.Log("Pathfinding from: " + position);
+            foreach (Transform t in a)
+            {
+                Debug.Log(t.GetComponent<Tile>().position);
+            }
+        }
     }
 
     private void Update()
     {
-        if (isTurn && Input.GetMouseButtonDown(0))
+        
+    }
+
+    public void SetTurn()
+    {
+        isTurn = true;
+        alreadyMoved = false;
+        moveRangeShowing = false;
+        if (CompareTag("Enemy Unit"))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Tiles")))
-            {
-                if (hit.transform.GetComponentInParent<Tile>().selected)
-                {
-                    MoveToTile(hit.transform.GetComponentInParent<Tile>().position);
-                    bm.DeselectTiles();
-                    bm.SelectTiles(GetValidMovePositions());
-                }
-            }
+            // Pass turn for now
+            StartCoroutine(WaitToEndTurn());
         }
+        else
+        {
+            
+        }
+    }
+
+    IEnumerator WaitToEndTurn()
+    {
+        yield return new WaitForEndOfFrame();
+        EndTurn();
+    }
+
+    public void EndTurn()
+    {
+        isTurn = false;
+        sm.AdvanceTurnOrder();
+    }
+
+    public void ToggleMoveRange()
+    {
+        if(moveRangeShowing)
+        {
+            bm.DeselectTiles();
+        }
+        else
+        {
+            bm.SelectTiles(GetValidMovePositions());
+        }
+        moveRangeShowing = !moveRangeShowing;
+    }
+
+    public void BasicMove(Tile tile)
+    {
+        MoveToTile(tile.position);
+        ToggleMoveRange();
+        alreadyMoved = true;
+        sm.SelectUnit(this);
+        // For Testing purposes end turn after move
+        EndTurn();
     }
 
     public void MoveToTile(Vector2Int pos)
@@ -272,5 +319,96 @@ public class UnitController : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    // Algorithm derived from Michal Magdziarz's website https://blog.theknightsofunity.com/pathfinding-on-a-hexagonal-grid-a-algorithm/
+    public List<Transform> PathfindToTile(Vector2Int pos)
+    {
+        List<Tile> openPathTiles = new List<Tile>();
+        List<Tile> closedPathTiles = new List<Tile>();
+
+        // Prepare the start tile.
+        Tile startPoint = bm.GetTile(position).GetComponent<Tile>();
+        Tile endPoint = bm.GetTile(pos).GetComponent<Tile>();
+        Tile currentTile = startPoint;
+
+        currentTile.parent = null;
+        currentTile.g = 0;
+        currentTile.h = GetH(startPoint.nodePosition, endPoint.nodePosition);
+
+        // Add the start tile to the open list.
+        openPathTiles.Add(currentTile);
+
+        while (openPathTiles.Count != 0)
+        {
+            // Sorting the open list to get the tile with the lowest F.
+            openPathTiles.Sort((a,b) => (a.g + a.h) - (b.g + b.h));
+            currentTile = openPathTiles[0];
+
+            // Removing the current tile from the open list and adding it to the closed list.
+            openPathTiles.Remove(currentTile);
+            closedPathTiles.Add(currentTile);
+
+            int g = currentTile.g + 1;
+
+            // If there is a target tile in the closed list, we have found a path.
+            if (closedPathTiles.Contains(endPoint))
+            {
+                break;
+            }
+
+            CheckAdjacents(currentTile, bm.GetAdjacentTile(currentTile.position, Direction.ABOVE), openPathTiles, closedPathTiles, endPoint, g);
+            CheckAdjacents(currentTile, bm.GetAdjacentTile(currentTile.position, Direction.UPPER_RIGHT), openPathTiles, closedPathTiles, endPoint, g);
+            CheckAdjacents(currentTile, bm.GetAdjacentTile(currentTile.position, Direction.LOWER_RIGHT), openPathTiles, closedPathTiles, endPoint, g);
+            CheckAdjacents(currentTile, bm.GetAdjacentTile(currentTile.position, Direction.BELOW), openPathTiles, closedPathTiles, endPoint, g);
+            CheckAdjacents(currentTile, bm.GetAdjacentTile(currentTile.position, Direction.LOWER_LEFT), openPathTiles, closedPathTiles, endPoint, g);
+            CheckAdjacents(currentTile, bm.GetAdjacentTile(currentTile.position, Direction.UPPER_LEFT), openPathTiles, closedPathTiles, endPoint, g);
+        }
+
+        // Backtracking - setting the final path.
+        List<Transform> tiles = new List<Transform>();
+        if (closedPathTiles.Contains(endPoint))
+        {
+            Tile current = endPoint;
+            int counter = 500;
+            while(current != null && counter > 0)
+            {
+                tiles.Add(bm.GetTile(current.position));
+                current = current.parent;
+                counter--;
+            }
+            tiles.Reverse();
+        }
+
+        return tiles;
+    }
+
+    private void CheckAdjacents(Tile parent, Transform node, List<Tile> openPathTiles, List<Tile> closedPathTiles, Tile endPoint, int g)
+    {
+        if (node == null)
+            return;
+        Tile adjacentTile = node.GetComponent<Tile>();
+        // Check if tile is valid
+        if (node != null && bm.TileIsMovable(node) && !TileOccupied(node) && !closedPathTiles.Contains(adjacentTile))
+        {
+            if (!openPathTiles.Contains(adjacentTile))
+            {
+                adjacentTile.g = g;
+                adjacentTile.h = GetH(adjacentTile.nodePosition, endPoint.nodePosition);
+                adjacentTile.parent = parent;
+                openPathTiles.Add(adjacentTile);
+            }
+            // Otherwise check if using current G we can get a lower value of F, if so update it's value.
+            else if (adjacentTile.g + adjacentTile.h > g + adjacentTile.h)
+            {
+                adjacentTile.g = g;
+                adjacentTile.parent = parent;
+            }
+        }
+    }
+
+    private int GetH(Vector3Int t1, Vector3Int t2)
+    {
+        return Mathf.Max(Mathf.Abs(t1.x - t2.x), Mathf.Abs(t1.y - t2.y), Mathf.Abs(t1.z - t2.z));
     }
 }

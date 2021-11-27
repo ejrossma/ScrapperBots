@@ -9,4 +9,8 @@ public class Tile : MonoBehaviour
     public Vector2Int position;
     public TileType tileType;
     public bool selected;
+    public Vector3Int nodePosition;
+    public int g;
+    public int h;
+    public Tile parent;
 }

@@ -171,6 +171,20 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!64 &7409968666005159623
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3699075101937819959}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -1525851828371913267, guid: 0282b05f3936e5e4186cf79496518190, type: 3}
 --- !u!1001 &2150198170717783623
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -235,6 +249,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -1089978440763126600, guid: e797aa28922974a48946073853e185de, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1089978440763126600, guid: e797aa28922974a48946073853e185de, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: d1f9217b1f0034a9ab0e222f2b585bda, type: 2}
@@ -252,5 +270,10 @@ GameObject:
 --- !u!4 &1899868842363543980 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e797aa28922974a48946073853e185de, type: 3}
+  m_PrefabInstance: {fileID: 2150198170717783623}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3699075101937819959 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3351461992852023152, guid: e797aa28922974a48946073853e185de, type: 3}
   m_PrefabInstance: {fileID: 2150198170717783623}
   m_PrefabAsset: {fileID: 0}
