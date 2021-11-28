@@ -18,14 +18,23 @@ public class UnitController : MonoBehaviour
     public Vector2Int position;
     public bool isTurn;
     public bool alreadyMoved;
+    public bool actionUsed;
     public bool moveRangeShowing;
     public Sprite icon;
+
+    //time elasped for Lerp
+    private float travelTime;
+    //goal time for Lerp
+    private float waitTime;
 
     private BoardManager bm;
     private SystemManager sm;
 
     private void Start()
     {
+        //interpolation rate for movement of units
+        travelTime = 0.0f;
+        waitTime = 0.5f;
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
         MoveToTile(position);
@@ -37,12 +46,12 @@ public class UnitController : MonoBehaviour
             {
                 Debug.Log(t.GetComponent<Tile>().position);
             }
-        }
+        }   
     }
 
     private void Update()
     {
-        
+
     }
 
     public void SetTurn()
@@ -88,12 +97,14 @@ public class UnitController : MonoBehaviour
 
     public void BasicMove(Tile tile)
     {
-        MoveToTile(tile.position);
         ToggleMoveRange();
+        List<Transform> a = PathfindToTile(tile.position);
+        //start lerping
+        IEnumerator move = InterpolateUnit(a);
+        StopCoroutine(move);
+        StartCoroutine(move);
         alreadyMoved = true;
         sm.SelectUnit(this);
-        // For Testing purposes end turn after move
-        EndTurn();
     }
 
     public void MoveToTile(Vector2Int pos)
@@ -101,9 +112,59 @@ public class UnitController : MonoBehaviour
         Transform newPos = bm.GetTile(pos);
         if (newPos != null)
         {
-            transform.position = newPos.position;
             position = pos;
         }
+    }
+
+    IEnumerator InterpolateUnit(List<Transform> tiles)
+    {
+        foreach (Transform t in tiles) {
+            Vector3 start = transform.position;
+            //calculate rotation
+            transform.rotation = calculateRotation(t);
+            while (travelTime < waitTime) { //condition for interpolation
+                transform.position = Vector3.Lerp(start, t.transform.position, (travelTime / waitTime));
+                travelTime += Time.deltaTime;
+                yield return null;
+            }
+            travelTime = 0.0f;
+            position = t.GetComponent<Tile>().position;
+        }
+        //End for testing purposes
+        transform.rotation = Quaternion.Euler(0,0,0);
+        EndTurn();
+    }
+
+    private Quaternion calculateRotation(Transform tile) {
+        //when x is odd lower is in same row
+        //when x is even higher is in same row
+
+        //if 1 row to the left
+            //upper left (300 degrees)
+            //lower left (240 degrees)
+        //if same row
+            //forward (0 degrees)
+            //backward (180 degrees)
+        //if 1 row to the right
+            //upper right (60 degrees)
+            //lower right (120 degrees)
+
+        float rotValue = 0.0f;
+        Vector2Int t = tile.GetComponent<Tile>().position;
+        if ((position.x % 2 != 0 && position.x > t.x && position.y < t.y) || (position.x % 2 == 0 && position.x > t.x && position.y == t.y)) //upper left
+            rotValue = 300.0f;
+        else if ((position.x % 2 != 0 && position.x > t.x && position.y == t.y) || (position.x % 2 == 0 && position.x > t.x && position.y > t.y))  //lower left
+            rotValue = 240.0f;
+        else if (position.x == t.x && position.y < t.y)  //forward
+            rotValue = 0.0f;
+        else if (position.x == t.x && position.y > t.y)  //backward
+            rotValue = 180.0f;
+        else if ((position.x % 2 != 0 && position.x < t.x && position.y < t.y) || (position.x % 2 == 0 && position.x < t.x && position.y == t.y))  //upper right
+            rotValue = 60.0f;
+        else if ((position.x % 2 != 0 && position.x < t.x && position.y == t.y) || (position.x % 2 == 0 && position.x < t.x && position.y > t.y))  //lower right
+            rotValue = 120.0f;
+        
+        return Quaternion.Euler(0, rotValue, 0);
     }
 
     public List<Transform> GetValidMovePositions()
