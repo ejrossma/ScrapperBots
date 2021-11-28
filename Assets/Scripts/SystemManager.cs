@@ -26,6 +26,7 @@ public class SystemManager : MonoBehaviour
     public Sprite defaultTurnIcon;
     public GameObject moveButton;
     public GameObject attackButton;
+    public GameObject maintainActionButton;
     public GameObject overloadButton;
     public GameObject skillsButton;
     public GameObject harvestButton;
@@ -71,7 +72,13 @@ public class SystemManager : MonoBehaviour
                     // Click on selected Tile
                     if (hit.transform.GetComponentInParent<Tile>().selected)
                     {
-                        unitTurnOrder[0].GetComponent<UnitController>().BasicMove(hit.transform.GetComponentInParent<Tile>());
+                        //if moving
+                        if (unitTurnOrder[0].GetComponent<UnitController>().moveRangeShowing)
+                            unitTurnOrder[0].GetComponent<UnitController>().BasicMove(hit.transform.GetComponentInParent<Tile>());
+                        else if (unitTurnOrder[0].GetComponent<UnitController>().attackRangeShowing)
+                            unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<Tile>());
+                            //THIS DOESN'T WORK BECAUSE YOU DONT CLICK ON THE TILE YOU CLICK ON A UNIT
+                        
                     }
                     // Click on unselected Tile
                     else
@@ -79,7 +86,7 @@ public class SystemManager : MonoBehaviour
                         
                     }
                 }
-                else if (hit.transform.GetComponentInParent<UnitController>())
+                else if (hit.transform.GetComponentInParent<UnitController>() && !unitTurnOrder[0].GetComponent<UnitController>().inActionorMovement())
                 {
                     // Click on unit
                     SelectUnit(hit.transform.GetComponentInParent<UnitController>());
@@ -165,15 +172,24 @@ public class SystemManager : MonoBehaviour
         displayDebuffs.text = "Debuffs:";
         Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(unit.gameObject.transform.position.x, 10, unit.gameObject.transform.position.z - 4.5f));
         // Activate turn UI on unit's turn, otherwise deactivate turn UI
-        if(unit.isTurn)
+        if (unit.isTurn && !unit.moving && !unit.acting)
         {
             moveButton.GetComponent<Button>().enabled = !unit.alreadyMoved;
             moveButton.GetComponent<Button>().onClick.RemoveAllListeners();
             moveButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleMoveRange());
+
+            attackButton.GetComponent<Button>().enabled = !unit.actionUsed;
+            attackButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            attackButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleAttackRange());
+
+            maintainActionButton.GetComponent<Button>().enabled = true;
+            maintainActionButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
         }
         else
         {
             moveButton.GetComponent<Button>().enabled = false;
+            attackButton.GetComponent<Button>().enabled = false;
         }
     }
 

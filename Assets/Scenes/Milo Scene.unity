@@ -375,6 +375,10 @@ PrefabInstance:
       propertyPath: tileType
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5232551761355916256, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6547684182167668676, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -927,6 +931,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: ATKRNG
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
       propertyPath: isTurn
       value: 0
       objectReference: {fileID: 0}
@@ -1200,7 +1208,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Spend Scrap
+  m_Text: Pass Turn (Hold Action)
 --- !u!222 &284192593
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1263,6 +1271,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6a94b429557647fbb598af5aed49855, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackIndicatorMat: {fileID: 2100000, guid: e410d3a230339ca44a8a4329b6ddda56, type: 2}
+  moveIndicatorMat: {fileID: 2100000, guid: 75e9426f808ac4ce5af967e3a1ff9527, type: 2}
 --- !u!1 &323592541
 GameObject:
   m_ObjectHideFlags: 0
@@ -1410,7 +1420,7 @@ GameObject:
   - component: {fileID: 353110920}
   - component: {fileID: 353110919}
   m_Layer: 5
-  m_Name: Spend Scrap
+  m_Name: Maintain Action
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1493,19 +1503,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 353110921}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 353110919}
-        m_TargetAssemblyTypeName: SpendScrapControl, Assembly-CSharp
-        m_MethodName: OpenScrapPanel
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &353110921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3851,6 +3849,7 @@ MonoBehaviour:
   defaultTurnIcon: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   moveButton: {fileID: 730414361}
   attackButton: {fileID: 717523178}
+  maintainActionButton: {fileID: 353110917}
   overloadButton: {fileID: 1337013119}
   skillsButton: {fileID: 897777294}
   harvestButton: {fileID: 974028244}
@@ -7448,6 +7447,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: ATKRNG
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
       propertyPath: isTurn
       value: 0
       objectReference: {fileID: 0}
@@ -7914,6 +7917,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
       propertyPath: TRD
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: ATKRNG
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}

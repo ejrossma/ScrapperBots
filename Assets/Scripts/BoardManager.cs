@@ -6,6 +6,9 @@ public enum Direction { ABOVE, UPPER_RIGHT, LOWER_RIGHT, BELOW, LOWER_LEFT, UPPE
 
 public class BoardManager : MonoBehaviour
 {
+    public Material attackIndicatorMat;
+    public Material moveIndicatorMat;
+
     private int rows;
     private int cols;
     private Transform[,] tiles;
@@ -71,6 +74,28 @@ public class BoardManager : MonoBehaviour
                 tiles[r, c].GetComponent<Tile>().selected = false;
             }
         }
+    }
+
+    public void ChangeIndicator(Color col) {
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                if (col == Color.red) 
+                {
+                    tiles[r, c].GetChild(0).transform.GetChild(3).GetComponent<MeshRenderer>().material = attackIndicatorMat;
+                    tiles[r, c].GetChild(0).transform.GetChild(4).GetComponent<MeshRenderer>().material = attackIndicatorMat;
+                    tiles[r, c].GetChild(0).transform.GetChild(5).GetComponent<MeshRenderer>().material = attackIndicatorMat;
+                }
+                else if (col == Color.blue)
+                {
+                    tiles[r, c].GetChild(0).transform.GetChild(3).GetComponent<MeshRenderer>().material = moveIndicatorMat;
+                    tiles[r, c].GetChild(0).transform.GetChild(4).GetComponent<MeshRenderer>().material = moveIndicatorMat;
+                    tiles[r, c].GetChild(0).transform.GetChild(5).GetComponent<MeshRenderer>().material = moveIndicatorMat;                    
+                }
+
+            }
+        }        
     }
 
     public bool TileIsMovable(Transform tile)
