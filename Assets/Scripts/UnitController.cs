@@ -233,23 +233,26 @@ public class UnitController : MonoBehaviour
     }
 
     //calculates direction when given a target tile
-    public Direction calculateDirection(Transform tile) 
+    public Direction CalculateDirection(Transform tile) 
     {
-        Vector2Int t = tile.GetComponent<Tile>().position;
-        if ((position.x % 2 != 0 && position.x > t.x && position.y < t.y) || (position.x % 2 == 0 && position.x > t.x && position.y == t.y)) //upper left
-            return Direction.UPPER_LEFT;
-        else if ((position.x % 2 != 0 && position.x > t.x && position.y == t.y) || (position.x % 2 == 0 && position.x > t.x && position.y > t.y))  //lower left
-            return Direction.LOWER_LEFT;
-        else if (position.x == t.x && position.y < t.y)  //forward
+        Vector3Int currentTile = bm.GetTile(position).GetComponent<Tile>().nodePosition;
+        Vector3Int targetTile = tile.GetComponent<Tile>().nodePosition;
+
+        if (targetTile.y > currentTile.y && targetTile.z < currentTile.z)
             return Direction.ABOVE;
-        else if (position.x == t.x && position.y > t.y)  //backward
-            return Direction.BELOW;
-        else if ((position.x % 2 != 0 && position.x < t.x && position.y < t.y) || (position.x % 2 == 0 && position.x < t.x && position.y == t.y))  //upper right
+        else if (targetTile.x > currentTile.x && targetTile.z < currentTile.z)
             return Direction.UPPER_RIGHT;
-        else if ((position.x % 2 != 0 && position.x < t.x && position.y == t.y) || (position.x % 2 == 0 && position.x < t.x && position.y > t.y))  //lower right
+        else if (targetTile.x > currentTile.x && targetTile.y < currentTile.y)
             return Direction.LOWER_RIGHT;
-        
-        return Direction.UPPER_RIGHT;
+        else if (targetTile.z > currentTile.z && targetTile.y < currentTile.y)
+            return Direction.BELOW;
+        else if (targetTile.z > currentTile.z && targetTile.x < currentTile.x)
+            return Direction.LOWER_LEFT;
+        else if (targetTile.y > currentTile.y && targetTile.x < currentTile.x)
+            return Direction.UPPER_LEFT;
+
+        Debug.Log("Direction not found!");
+        return Direction.ABOVE;
     }
 
     public List<Transform> GetValidMovePositions()

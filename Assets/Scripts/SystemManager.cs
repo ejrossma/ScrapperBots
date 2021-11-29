@@ -82,7 +82,7 @@ public class SystemManager : MonoBehaviour
                         else if (activeUnit.attackRangeShowing)
                             activeUnit.BasicAttack(hit.transform.GetComponentInParent<Tile>().position);
                         else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.BIG_PAL)
-                            activeUnit.GetComponent<BigPal>().Intercept(activeUnit.calculateDirection(hit.transform.GetComponentInParent<Tile>().transform));
+                            activeUnit.GetComponent<BigPal>().Intercept(activeUnit.CalculateDirection(hit.transform.GetComponentInParent<Tile>().transform));
 
                     }
                     // Click on unselected Tile

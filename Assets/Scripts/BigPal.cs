@@ -28,7 +28,9 @@ public class BigPal : MonoBehaviour
         List<Vector2Int> visited = new List<Vector2Int>();
 
         Transform target = GenerateInterceptTiles(visited, uc.position, dir);
+        Debug.Log(dir);
         Debug.Log(target.GetComponent<Tile>().position);
+        uc.abilityOneRangeShowing = false;
         bm.DeselectTiles();
         //given a chosen direction lerp in that direction until hit a player, wall, edge of map
         //update enemies and players hit depending on what ability says
@@ -80,16 +82,12 @@ public class BigPal : MonoBehaviour
     private Transform GenerateInterceptTiles(List<Vector2Int> visited, Vector2Int node, Direction dir) 
     {
         //return statement
-        Transform tile = bm.GetTile(node);
-        if (bm.TileIsMovable(tile) && (!uc.TileOccupiedByFriendly(tile) || node == GetComponent<UnitController>().position))
-            visited.Add(node);
-        else
-            return bm.GetTile(node);
+        visited.Add(node);
 
-        Transform temp = bm.GetAdjacentTile(node, dir);
-        if (temp == null)
+        Transform tile = bm.GetAdjacentTile(node, dir);
+        if (tile == null || !bm.TileIsMovable(tile) || uc.TileOccupiedByFriendly(tile))
             return bm.GetTile(node);
-        return GenerateInterceptTiles(visited, temp.GetComponent<Tile>().position, dir);    
+        return GenerateInterceptTiles(visited, tile.GetComponent<Tile>().position, dir);    
     }
 
     //basic ability
