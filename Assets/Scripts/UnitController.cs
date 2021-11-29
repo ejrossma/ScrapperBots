@@ -24,6 +24,8 @@ public class UnitController : MonoBehaviour
     public bool actionUsed;
     public bool heldAction;
     public bool moveRangeShowing;
+    public bool abilityOneRangeShowing;
+    public bool abilityTwoRangeShowing;
     public bool attackRangeShowing;
     public Sprite icon;
 
@@ -182,12 +184,11 @@ public class UnitController : MonoBehaviour
             {
                 transform.position = Vector3.Lerp(start, t.transform.position, (travelTime / waitTime));
                 travelTime += Time.deltaTime;
+                Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(transform.position.x, 10, transform.position.z - 4.5f));
                 yield return null;
             }
             travelTime = 0.0f;
             position = t.GetComponent<Tile>().position;
-            Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(t.transform.position.x, 10, t.transform.position.z - 4.5f));
-
         }
         //End for testing purposes
         //if friendly set y to 0 
@@ -198,7 +199,7 @@ public class UnitController : MonoBehaviour
     }
 
     //calculates rotation when given a target tile to look at (can be used for attacks and movement)
-    private Quaternion calculateRotation(Transform tile) 
+    public Quaternion calculateRotation(Transform tile) 
     {
         //when x is odd lower is in same row
         //when x is even higher is in same row
@@ -229,6 +230,26 @@ public class UnitController : MonoBehaviour
             rotValue = 120.0f;
         
         return Quaternion.Euler(0, rotValue, 0);
+    }
+
+    //calculates direction when given a target tile
+    public Direction calculateDirection(Transform tile) 
+    {
+        Vector2Int t = tile.GetComponent<Tile>().position;
+        if ((position.x % 2 != 0 && position.x > t.x && position.y < t.y) || (position.x % 2 == 0 && position.x > t.x && position.y == t.y)) //upper left
+            return Direction.UPPER_LEFT;
+        else if ((position.x % 2 != 0 && position.x > t.x && position.y == t.y) || (position.x % 2 == 0 && position.x > t.x && position.y > t.y))  //lower left
+            return Direction.LOWER_LEFT;
+        else if (position.x == t.x && position.y < t.y)  //forward
+            return Direction.ABOVE;
+        else if (position.x == t.x && position.y > t.y)  //backward
+            return Direction.BELOW;
+        else if ((position.x % 2 != 0 && position.x < t.x && position.y < t.y) || (position.x % 2 == 0 && position.x < t.x && position.y == t.y))  //upper right
+            return Direction.UPPER_RIGHT;
+        else if ((position.x % 2 != 0 && position.x < t.x && position.y == t.y) || (position.x % 2 == 0 && position.x < t.x && position.y > t.y))  //lower right
+            return Direction.LOWER_RIGHT;
+        
+        return Direction.UPPER_RIGHT;
     }
 
     public List<Transform> GetValidMovePositions()

@@ -32,6 +32,7 @@ public class SystemManager : MonoBehaviour
     public GameObject skillsButton;
     public GameObject harvestButton;
     public GameObject skillsPanel;
+    public GameObject secondPanel;
     public GameObject ability1Button;
     public GameObject ability2Button;
     public GameObject closeSkillsPanelButton;
@@ -61,9 +62,10 @@ public class SystemManager : MonoBehaviour
             RaycastHit hit;
             if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray, out hit, 250f))
             {
+                UnitController activeUnit = unitTurnOrder[0].GetComponent<UnitController>();
                 if (unitTurnOrder[0].CompareTag("Friendly Unit"))
                 {
-                    SelectUnit(unitTurnOrder[0].GetComponent<UnitController>());
+                    SelectUnit(activeUnit);
                 } 
                 else
                 {
@@ -75,10 +77,13 @@ public class SystemManager : MonoBehaviour
                     if (hit.transform.GetComponentInParent<Tile>().selected)
                     {
                         //if moving
-                        if (unitTurnOrder[0].GetComponent<UnitController>().moveRangeShowing)
-                            unitTurnOrder[0].GetComponent<UnitController>().BasicMove(hit.transform.GetComponentInParent<Tile>());
-                        else if (unitTurnOrder[0].GetComponent<UnitController>().attackRangeShowing)
-                            unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<Tile>().position);
+                        if (activeUnit.moveRangeShowing)
+                            activeUnit.BasicMove(hit.transform.GetComponentInParent<Tile>());
+                        else if (activeUnit.attackRangeShowing)
+                            activeUnit.BasicAttack(hit.transform.GetComponentInParent<Tile>().position);
+                        else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.BIG_PAL)
+                            activeUnit.GetComponent<BigPal>().Intercept(activeUnit.calculateDirection(hit.transform.GetComponentInParent<Tile>().transform));
+
                     }
                     // Click on unselected Tile
                     else
@@ -86,17 +91,22 @@ public class SystemManager : MonoBehaviour
                         
                     }
                 }
-                else if (hit.transform.GetComponentInParent<UnitController>() && unitTurnOrder[0].GetComponent<UnitController>().attackRangeShowing)
+                //if clicked on unit
+                else if (hit.transform.GetComponentInParent<UnitController>())
                 {
-                    // Click on unit with attack range showing
-                    if (bm.GetTile(hit.transform.GetComponentInParent<UnitController>().position).GetComponent<Tile>().selected)
-                        unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<UnitController>().position);
+                    if (activeUnit.attackRangeShowing)
+                    {
+                        // Click on unit with attack range showing
+                        if (bm.GetTile(hit.transform.GetComponentInParent<UnitController>().position).GetComponent<Tile>().selected)
+                            activeUnit.BasicAttack(hit.transform.GetComponentInParent<UnitController>().position);
+                    }
+                    else if (!activeUnit.inActionorMovement())
+                    {
+                        // Click on unit
+                        SelectUnit(hit.transform.GetComponentInParent<UnitController>());
+                    }
                 }
-                else if (hit.transform.GetComponentInParent<UnitController>() && !unitTurnOrder[0].GetComponent<UnitController>().inActionorMovement())
-                {
-                    // Click on unit
-                    SelectUnit(hit.transform.GetComponentInParent<UnitController>());
-                }
+
             }
             else if(!EventSystem.current.IsPointerOverGameObject())
             {
@@ -180,14 +190,17 @@ public class SystemManager : MonoBehaviour
         // Activate turn UI on unit's turn, otherwise deactivate turn UI
         if (unit.isTurn && !unit.moving && !unit.acting)
         {
+            //move button
             moveButton.GetComponent<Button>().interactable = !unit.alreadyMoved;
             moveButton.GetComponent<Button>().onClick.RemoveAllListeners();
             moveButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleMoveRange());
 
+            //attack button
             attackButton.GetComponent<Button>().interactable = !unit.actionUsed && unit.GetValidAttackPositions().Count > 0;
             attackButton.GetComponent<Button>().onClick.RemoveAllListeners();
             attackButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleAttackRange());
 
+            //hold action button
             maintainActionButton.GetComponent<Button>().interactable = true;
             maintainActionButton.GetComponent<Button>().onClick.RemoveAllListeners();
             if (!unit.heldAction && (!unit.actionUsed || !unit.alreadyMoved)) {
@@ -197,6 +210,12 @@ public class SystemManager : MonoBehaviour
                 maintainActionButton.GetComponentInChildren<Text>().text = "End Turn";
             }
             maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
+
+            //ability button
+            skillsButton.GetComponent<Button>().interactable = !unit.actionUsed;
+            skillsButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            //need to make a show abilities function and add the UI into game
+            skillsButton.GetComponent<Button>().onClick.AddListener(() => ToggleAbilities(unit));
         }
         else
         {
@@ -234,7 +253,8 @@ public class SystemManager : MonoBehaviour
         displayDebuffs.text = "Debuffs:";
     }
 
-    public void UpdateStats(UnitController unit) {
+    public void UpdateStats(UnitController unit) 
+    {
         displayName.text = unit.unitName;
         displayHealth.text = "Health: " + unit.HP;
         displayArmor.text = "Armor: " + unit.AMR;
@@ -244,5 +264,50 @@ public class SystemManager : MonoBehaviour
         displayAttack.text = "Attack: " + unit.ATK;
         displayBuffs.text = "Buffs:";
         displayDebuffs.text = "Debuffs:";        
+    }
+
+    public void ToggleAbilities(UnitController unit) 
+    {
+        skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf);
+        closeSkillsPanelButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => { skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf); bm.DeselectTiles(); });
+        //if active then change names of abilities to match the player unit
+        if (skillsPanel.activeSelf)
+        {
+            ability1Button.GetComponent<Button>().onClick.RemoveAllListeners();
+            ability2Button.GetComponent<Button>().onClick.RemoveAllListeners();
+            switch (unit.unitClass)
+            {
+                case UnitClass.BIG_PAL:
+                    ability1Button.GetComponentInChildren<Text>().text = "Intercept";
+                    ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleInterceptRange()); //ability call here
+
+                    ability2Button.GetComponentInChildren<Text>().text = "The Best Defense";
+                    ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().GetValidBestDefenseRange()); //ability call here
+                    break;
+                // case UnitClass.SCRAPPER:
+                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+
+                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                //     break;
+                // case UnitClass.WITCH:
+                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+
+                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                //     break;
+                // case UnitClass.ELECTROMANCER:
+                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+
+                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                //     break;                                                
+            }
+        }
+
     }
 }

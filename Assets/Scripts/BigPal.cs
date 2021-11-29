@@ -25,9 +25,30 @@ public class BigPal : MonoBehaviour
     //basic ability
     public void Intercept(Direction dir) 
     {
+        List<Vector2Int> visited = new List<Vector2Int>();
+
+        Transform target = GenerateInterceptTiles(visited, uc.position, dir);
+        Debug.Log(target.GetComponent<Tile>().position);
+        bm.DeselectTiles();
         //given a chosen direction lerp in that direction until hit a player, wall, edge of map
         //update enemies and players hit depending on what ability says
         //check tile in dir to see if friendly unit stopped the charge
+    }
+
+    public void ToggleInterceptRange()
+    {
+        if (GetComponent<UnitController>().attackRangeShowing) 
+        {
+            bm.DeselectTiles();
+        }
+        else
+        {
+            GetComponent<UnitController>().moveRangeShowing = false;
+            bm.DeselectTiles();
+            bm.SelectTiles(GetValidInterceptionRange());
+            bm.ChangeIndicator(Color.blue);
+        }
+        GetComponent<UnitController>().abilityOneRangeShowing = !GetComponent<UnitController>().abilityOneRangeShowing;
     }
 
     //straight line out in all directions until hit edge of map, wall, or ally
@@ -56,25 +77,30 @@ public class BigPal : MonoBehaviour
         return tiles;
     }
 
-    private void GenerateInterceptTiles(List<Vector2Int> visited, Vector2Int node, Direction dir) 
+    private Transform GenerateInterceptTiles(List<Vector2Int> visited, Vector2Int node, Direction dir) 
     {
         //return statement
         Transform tile = bm.GetTile(node);
-        if (bm.TileIsMovable(tile) && !uc.TileOccupiedByFriendly(tile))
+        if (bm.TileIsMovable(tile) && (!uc.TileOccupiedByFriendly(tile) || node == GetComponent<UnitController>().position))
             visited.Add(node);
         else
-            return;
+            return bm.GetTile(node);
 
         Transform temp = bm.GetAdjacentTile(node, dir);
-        if (temp == null || !bm.TileIsMovable(temp) || uc.TileOccupiedByFriendly(tile))
-            return;
-        GenerateInterceptTiles(visited, temp.GetComponent<Tile>().position, dir);    
+        if (temp == null)
+            return bm.GetTile(node);
+        return GenerateInterceptTiles(visited, temp.GetComponent<Tile>().position, dir);    
     }
 
     //basic ability
     public void TheBestDefense() 
     {
 
+    }
+
+    public void GetValidBestDefenseRange() 
+    {
+        Debug.Log("Best Defense Used");
     }
 
     //meltdown ability
