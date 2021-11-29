@@ -46,15 +46,6 @@ public class UnitController : MonoBehaviour
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
         MoveToTile(position);
-        // if (true)
-        // {
-        //     List<Transform> a = PathfindToTile(new Vector2Int(0, 0));
-        //     Debug.Log("Pathfinding from: " + position);
-        //     foreach (Transform t in a)
-        //     {
-        //         Debug.Log(t.GetComponent<Tile>().position);
-        //     }
-        // }   
     }
 
     private void Update()
@@ -65,8 +56,6 @@ public class UnitController : MonoBehaviour
     public void SetTurn()
     {
         isTurn = true;
-        alreadyMoved = false;
-        actionUsed = false;
         moveRangeShowing = false;
         attackRangeShowing = false;
         if (CompareTag("Enemy Unit"))
@@ -90,6 +79,7 @@ public class UnitController : MonoBehaviour
     {
         isTurn = false;
         sm.AdvanceTurnOrder();
+        bm.DeselectTiles();
     }
 
     public void ToggleMoveRange()
@@ -139,10 +129,32 @@ public class UnitController : MonoBehaviour
 
     public void BasicAttack(Vector2Int pos) 
     {
-        Debug.Log("Attack");
+        //get unit at pos
+        UnitController unit = sm.GetUnit(pos);
+        Debug.Log(unitName + " attacked " + unit.unitName + " for " + ATK + "!");
+        transform.rotation = calculateRotation(bm.GetTile(pos));
+        StopCoroutine(ResetRotationAfterAttack());
+        StartCoroutine(ResetRotationAfterAttack());
+        LoseHealth(unit, ATK);
         actionUsed = true;
         ToggleAttackRange();
         sm.SelectUnit(this);
+    }
+
+    IEnumerator ResetRotationAfterAttack() 
+    {
+        
+        yield return new WaitForSeconds(0.75f);
+
+        transform.rotation = Quaternion.Euler(0,0,0);
+
+    }
+
+    private void LoseHealth(UnitController unit, int damage) 
+    {
+        unit.HP -= damage;
+        if (unit.HP < 0)
+            unit.HP = 0;
     }
 
     public void MoveToTile(Vector2Int pos)
@@ -154,7 +166,8 @@ public class UnitController : MonoBehaviour
         }
     }
 
-    public bool inActionorMovement() {
+    public bool inActionorMovement() 
+    {
         return attackRangeShowing || moveRangeShowing || acting || moving;
     }
 
@@ -423,7 +436,7 @@ public class UnitController : MonoBehaviour
         }
     }
 
-    private bool TileOccupied(Transform tile)
+    public bool TileOccupied(Transform tile)
     {
         foreach (GameObject unit in sm.activeUnits)
         {
@@ -433,7 +446,7 @@ public class UnitController : MonoBehaviour
         return false;
     }
 
-    private bool TileOccupiedByTarget(Transform tile)
+    public bool TileOccupiedByTarget(Transform tile)
     {
         if(CompareTag("Friendly Unit"))
         {
@@ -446,6 +459,27 @@ public class UnitController : MonoBehaviour
         else
         {
             foreach (GameObject unit in sm.friendlyUnits)
+            {
+                if (unit.GetComponent<UnitController>().position == tile.GetComponent<Tile>().position)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public bool TileOccupiedByFriendly(Transform tile)
+    {
+        if(CompareTag("Friendly Unit"))
+        {
+            foreach (GameObject unit in sm.friendlyUnits)
+            {
+                if (unit.GetComponent<UnitController>().position == tile.GetComponent<Tile>().position)
+                    return true;
+            }
+        }
+        else
+        {
+            foreach (GameObject unit in sm.enemyUnits)
             {
                 if (unit.GetComponent<UnitController>().position == tile.GetComponent<Tile>().position)
                     return true;
@@ -489,7 +523,7 @@ public class UnitController : MonoBehaviour
             return;
         }
         Transform temp = bm.GetAdjacentTile((Vector2Int)node, dir);
-        if (temp == null)
+        if (temp == null || !bm.TileIsMovable(temp))
             return;
         Vector2Int temp2 = temp.GetComponent<Tile>().position;
         CheckForAttack(visited, new Vector3Int(temp2.x, temp2.y, node.z+1), dir);

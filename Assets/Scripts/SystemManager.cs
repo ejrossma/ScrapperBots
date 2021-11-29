@@ -78,7 +78,7 @@ public class SystemManager : MonoBehaviour
                         if (unitTurnOrder[0].GetComponent<UnitController>().moveRangeShowing)
                             unitTurnOrder[0].GetComponent<UnitController>().BasicMove(hit.transform.GetComponentInParent<Tile>());
                         else if (unitTurnOrder[0].GetComponent<UnitController>().attackRangeShowing)
-                            unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<Tile>().position);                
+                            unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<Tile>().position);
                     }
                     // Click on unselected Tile
                     else
@@ -124,6 +124,8 @@ public class SystemManager : MonoBehaviour
     {
         foreach (GameObject g in activeUnits) {
             g.GetComponent<UnitController>().heldAction = false;
+            g.GetComponent<UnitController>().alreadyMoved = false;
+            g.GetComponent<UnitController>().actionUsed = false;
             unitTurnOrder.Add(g);
         }
 
@@ -173,15 +175,7 @@ public class SystemManager : MonoBehaviour
 
     public void SelectUnit(UnitController unit)
     {
-        displayName.text = unit.unitName;
-        displayHealth.text = "Health: " + unit.HP;
-        displayArmor.text = "Armor: " + unit.AMR;
-        displayBattery.text = "Battery: " + unit.CRG;
-        displayMovement.text = "Movement: " + unit.SPD;
-        displayThreads.text = "Threads: " + unit.TRD;
-        displayAttack.text = "Attack: " + unit.ATK;
-        displayBuffs.text = "Buffs:";
-        displayDebuffs.text = "Debuffs:";
+        UpdateStats(unit);
         Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(unit.gameObject.transform.position.x, 10, unit.gameObject.transform.position.z - 4.5f));
         // Activate turn UI on unit's turn, otherwise deactivate turn UI
         if (unit.isTurn && !unit.moving && !unit.acting)
@@ -196,14 +190,13 @@ public class SystemManager : MonoBehaviour
 
             maintainActionButton.GetComponent<Button>().interactable = true;
             maintainActionButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            if (!unit.heldAction) {
+            if (!unit.heldAction && (!unit.actionUsed || !unit.alreadyMoved)) {
                 maintainActionButton.GetComponent<Button>().onClick.AddListener(() => UnitHoldAction(unit.gameObject));
                 maintainActionButton.GetComponentInChildren<Text>().text = "Hold Action (Can only be used once)";
             } else {
                 maintainActionButton.GetComponentInChildren<Text>().text = "End Turn";
             }
-            maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());   
-
+            maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
         }
         else
         {
@@ -211,6 +204,15 @@ public class SystemManager : MonoBehaviour
             attackButton.GetComponent<Button>().interactable = false;
             maintainActionButton.GetComponent<Button>().interactable = false;
         }
+    }
+
+    //return the unit at a position
+    public UnitController GetUnit(Vector2Int pos) {
+        foreach (GameObject unit in activeUnits) {
+            if (unit.GetComponent<UnitController>().position == pos)
+                return unit.GetComponent<UnitController>();
+        }
+        return null;
     }
 
     public void SelectUnit(int id)
@@ -230,5 +232,17 @@ public class SystemManager : MonoBehaviour
         displayAttack.text = "Attack: ";
         displayBuffs.text = "Buffs:";
         displayDebuffs.text = "Debuffs:";
+    }
+
+    public void UpdateStats(UnitController unit) {
+        displayName.text = unit.unitName;
+        displayHealth.text = "Health: " + unit.HP;
+        displayArmor.text = "Armor: " + unit.AMR;
+        displayBattery.text = "Battery: " + unit.CRG;
+        displayMovement.text = "Movement: " + unit.SPD;
+        displayThreads.text = "Threads: " + unit.TRD;
+        displayAttack.text = "Attack: " + unit.ATK;
+        displayBuffs.text = "Buffs:";
+        displayDebuffs.text = "Debuffs:";        
     }
 }
