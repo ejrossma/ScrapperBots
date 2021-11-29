@@ -3846,6 +3846,7 @@ MonoBehaviour:
   displayAttack: {fileID: 1008468038}
   displayBuffs: {fileID: 1117768501}
   displayDebuffs: {fileID: 1003598460}
+  turnMarker: {fileID: 1021422232}
   defaultTurnIcon: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   moveButton: {fileID: 730414361}
   attackButton: {fileID: 717523178}
@@ -7441,6 +7442,26 @@ PrefabInstance:
     - target: {fileID: 64472721569381779, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: HP
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: AMR
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: ATK
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: CRG
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
+      propertyPath: SPD
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 64472721569381783, guid: 0a863ada39c8d476bb1cd0c99ba464ab, type: 3}
       propertyPath: TRD

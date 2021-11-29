@@ -23,6 +23,7 @@ public class SystemManager : MonoBehaviour
     public Text displayAttack;
     public Text displayBuffs;
     public Text displayDebuffs;
+    public Text turnMarker;
     public Sprite defaultTurnIcon;
     public GameObject moveButton;
     public GameObject attackButton;
@@ -35,6 +36,7 @@ public class SystemManager : MonoBehaviour
     public GameObject ability2Button;
     public GameObject closeSkillsPanelButton;
 
+    private int turnCount;
     private BoardManager bm;
 
     private void Awake()
@@ -87,7 +89,7 @@ public class SystemManager : MonoBehaviour
                 else if (hit.transform.GetComponentInParent<UnitController>() && unitTurnOrder[0].GetComponent<UnitController>().attackRangeShowing)
                 {
                     // Click on unit with attack range showing
-                    if(bm.GetTile(hit.transform.GetComponentInParent<UnitController>().position).GetComponent<Tile>().selected)
+                    if (bm.GetTile(hit.transform.GetComponentInParent<UnitController>().position).GetComponent<Tile>().selected)
                         unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<UnitController>().position);
                 }
                 else if (hit.transform.GetComponentInParent<UnitController>() && !unitTurnOrder[0].GetComponent<UnitController>().inActionorMovement())
@@ -120,14 +122,20 @@ public class SystemManager : MonoBehaviour
 
     private void SetTurnOrderRound()
     {
-        foreach (GameObject g in activeUnits)
+        foreach (GameObject g in activeUnits) {
+            g.GetComponent<UnitController>().heldAction = false;
             unitTurnOrder.Add(g);
+        }
+
         unitTurnOrder.Sort((a, b) => b.GetComponent<UnitController>().TRD - a.GetComponent<UnitController>().TRD);
+        turnCount++;
+        turnMarker.text = "Turn: " + turnCount;
         UpdateTurnOrderDisplay();
     }
 
     public void UnitHoldAction(GameObject unit)
     {
+        unit.GetComponent<UnitController>().heldAction = true;
         unitTurnOrder.Add(unit);
     }
 
@@ -188,7 +196,14 @@ public class SystemManager : MonoBehaviour
 
             maintainActionButton.GetComponent<Button>().interactable = true;
             maintainActionButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
+            if (!unit.heldAction) {
+                maintainActionButton.GetComponent<Button>().onClick.AddListener(() => UnitHoldAction(unit.gameObject));
+                maintainActionButton.GetComponentInChildren<Text>().text = "Hold Action (Can only be used once)";
+            } else {
+                maintainActionButton.GetComponentInChildren<Text>().text = "End Turn";
+            }
+            maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());   
+
         }
         else
         {

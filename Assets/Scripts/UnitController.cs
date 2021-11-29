@@ -22,6 +22,7 @@ public class UnitController : MonoBehaviour
     public bool alreadyMoved;
     public bool acting;
     public bool actionUsed;
+    public bool heldAction;
     public bool moveRangeShowing;
     public bool attackRangeShowing;
     public Sprite icon;
@@ -459,7 +460,12 @@ public class UnitController : MonoBehaviour
         // Vector3Int fields: X is column, Y is row, Z is length of path
         List<Vector3Int> visited = new List<Vector3Int>();
 
-        CheckForAttack(visited, new Vector3Int(position.x, position.y, 0));
+        CheckForAttack(visited, (Vector3Int)position, Direction.ABOVE);
+        CheckForAttack(visited, (Vector3Int)position, Direction.BELOW);
+        CheckForAttack(visited, (Vector3Int)position, Direction.UPPER_LEFT);
+        CheckForAttack(visited, (Vector3Int)position, Direction.LOWER_LEFT);
+        CheckForAttack(visited, (Vector3Int)position, Direction.UPPER_RIGHT);
+        CheckForAttack(visited, (Vector3Int)position, Direction.LOWER_RIGHT);
 
         List<Transform> tiles = new List<Transform>();
 
@@ -472,193 +478,22 @@ public class UnitController : MonoBehaviour
         return tiles;
     }
 
-    private void CheckForAttack(List<Vector3Int> visited, Vector3Int node)
+    private void CheckForAttack(List<Vector3Int> visited, Vector3Int node, Direction dir)
     {
-        visited.Add(node);
-
-        if (node.z == ATKRNG)
+        if (node.z == ATKRNG + 1)
             return;
 
-        Transform above = bm.GetAdjacentTile((Vector2Int)node, Direction.ABOVE);
-
-        // Check if tile is valid
-        if (above != null && bm.TileIsMovable(above) && TileOccupiedByTarget(above))
+        if (TileOccupiedByTarget(bm.GetTile((Vector2Int) node)))
         {
-            Vector2Int pos = above.GetComponent<Tile>().position;
-            // Check if tile is already in the list (replacing worse case nodes in conflict)
-            bool alreadyInList = false;
-            for (int i = 0; i < visited.Count; i++)
-            {
-                if (visited[i].x == pos.x && visited[i].y == pos.y)
-                {
-                    if (visited[i].z > node.z + 1)
-                    {
-                        visited.RemoveAt(i);
-                    }
-                    else
-                    {
-                        alreadyInList = true;
-                    }
-                    break;
-                }
-            }
-            // Add tile to visited if not already in list
-            if (!alreadyInList)
-            {
-                CheckForAttack(visited, new Vector3Int(pos.x, pos.y, node.z + 1));
-            }
+            visited.Add(node);
+            return;
         }
-
-        Transform upperRight = bm.GetAdjacentTile((Vector2Int)node, Direction.UPPER_RIGHT);
-
-        // Check if tile is valid
-        if (upperRight != null && bm.TileIsMovable(upperRight) && TileOccupiedByTarget(upperRight))
-        {
-            Vector2Int pos = upperRight.GetComponent<Tile>().position;
-            // Check if tile is already in the list (replacing worse case nodes in conflict)
-            bool alreadyInList = false;
-            for (int i = 0; i < visited.Count; i++)
-            {
-                if (visited[i].x == pos.x && visited[i].y == pos.y)
-                {
-                    if (visited[i].z > node.z + 1)
-                    {
-                        visited.RemoveAt(i);
-                    }
-                    else
-                    {
-                        alreadyInList = true;
-                    }
-                    break;
-                }
-            }
-            // Add tile to visited if not already in list
-            if (!alreadyInList)
-            {
-                CheckForAttack(visited, new Vector3Int(pos.x, pos.y, node.z + 1));
-            }
-        }
-
-        Transform lowerRight = bm.GetAdjacentTile((Vector2Int)node, Direction.LOWER_RIGHT);
-
-        // Check if tile is valid
-        if (lowerRight != null && bm.TileIsMovable(lowerRight) && TileOccupiedByTarget(lowerRight))
-        {
-            Vector2Int pos = lowerRight.GetComponent<Tile>().position;
-            // Check if tile is already in the list (replacing worse case nodes in conflict)
-            bool alreadyInList = false;
-            for (int i = 0; i < visited.Count; i++)
-            {
-                if (visited[i].x == pos.x && visited[i].y == pos.y)
-                {
-                    if (visited[i].z > node.z + 1)
-                    {
-                        visited.RemoveAt(i);
-                    }
-                    else
-                    {
-                        alreadyInList = true;
-                    }
-                    break;
-                }
-            }
-            // Add tile to visited if not already in list
-            if (!alreadyInList)
-            {
-                CheckForAttack(visited, new Vector3Int(pos.x, pos.y, node.z + 1));
-            }
-        }
-
-        Transform below = bm.GetAdjacentTile((Vector2Int)node, Direction.BELOW);
-
-        // Check if tile is valid
-        if (below != null && bm.TileIsMovable(below) && TileOccupiedByTarget(below))
-        {
-            Vector2Int pos = below.GetComponent<Tile>().position;
-            // Check if tile is already in the list (replacing worse case nodes in conflict)
-            bool alreadyInList = false;
-            for (int i = 0; i < visited.Count; i++)
-            {
-                if (visited[i].x == pos.x && visited[i].y == pos.y)
-                {
-                    if (visited[i].z > node.z + 1)
-                    {
-                        visited.RemoveAt(i);
-                    }
-                    else
-                    {
-                        alreadyInList = true;
-                    }
-                    break;
-                }
-            }
-            // Add tile to visited if not already in list
-            if (!alreadyInList)
-            {
-                CheckForAttack(visited, new Vector3Int(pos.x, pos.y, node.z + 1));
-            }
-        }
-
-        Transform lowerLeft = bm.GetAdjacentTile((Vector2Int)node, Direction.LOWER_LEFT);
-
-        // Check if tile is valid
-        if (lowerLeft != null && bm.TileIsMovable(lowerLeft) && TileOccupiedByTarget(lowerLeft))
-        {
-            Vector2Int pos = lowerLeft.GetComponent<Tile>().position;
-            // Check if tile is already in the list (replacing worse case nodes in conflict)
-            bool alreadyInList = false;
-            for (int i = 0; i < visited.Count; i++)
-            {
-                if (visited[i].x == pos.x && visited[i].y == pos.y)
-                {
-                    if (visited[i].z > node.z + 1)
-                    {
-                        visited.RemoveAt(i);
-                    }
-                    else
-                    {
-                        alreadyInList = true;
-                    }
-                    break;
-                }
-            }
-            // Add tile to visited if not already in list
-            if (!alreadyInList)
-            {
-                CheckForAttack(visited, new Vector3Int(pos.x, pos.y, node.z + 1));
-            }
-        }
-
-        Transform upperLeft = bm.GetAdjacentTile((Vector2Int)node, Direction.UPPER_LEFT);
-
-        // Check if tile is valid
-        if (upperLeft != null && bm.TileIsMovable(upperLeft) && TileOccupiedByTarget(upperLeft))
-        {
-            Vector2Int pos = upperLeft.GetComponent<Tile>().position;
-            // Check if tile is already in the list (replacing worse case nodes in conflict)
-            bool alreadyInList = false;
-            for (int i = 0; i < visited.Count; i++)
-            {
-                if (visited[i].x == pos.x && visited[i].y == pos.y)
-                {
-                    if (visited[i].z > node.z + 1)
-                    {
-                        visited.RemoveAt(i);
-                    }
-                    else
-                    {
-                        alreadyInList = true;
-                    }
-                    break;
-                }
-            }
-            // Add tile to visited if not already in list
-            if (!alreadyInList)
-            {
-                CheckForAttack(visited, new Vector3Int(pos.x, pos.y, node.z + 1));
-            }
-        }
-    }    
+        Transform temp = bm.GetAdjacentTile((Vector2Int)node, dir);
+        if (temp == null)
+            return;
+        Vector2Int temp2 = temp.GetComponent<Tile>().position;
+        CheckForAttack(visited, new Vector3Int(temp2.x, temp2.y, node.z+1), dir);
+    }
 
     // Algorithm derived from Michal Magdziarz's website https://blog.theknightsofunity.com/pathfinding-on-a-hexagonal-grid-a-algorithm/
     public List<Transform> PathfindToTile(Vector2Int pos)
