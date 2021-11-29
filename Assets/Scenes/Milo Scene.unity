@@ -7762,10 +7762,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1959518712}
     m_Modifications:
-    - target: {fileID: 169146882308000072, guid: fb942591425e3b34d950ba5002fd01b9, type: 3}
-      propertyPath: ATKRNG
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3362801624161871982, guid: fb942591425e3b34d950ba5002fd01b9, type: 3}
       propertyPath: m_RootOrder
       value: 2

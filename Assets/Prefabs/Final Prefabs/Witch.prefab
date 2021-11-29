@@ -878,6 +878,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4279199071631172330}
   - component: {fileID: 4279199071631172334}
+  - component: {fileID: 7186744000105931984}
   m_Layer: 0
   m_Name: Witch
   m_TagString: Friendly Unit
@@ -933,6 +934,18 @@ MonoBehaviour:
   moveRangeShowing: 0
   attackRangeShowing: 0
   icon: {fileID: 21300000, guid: 5722346b4f35a4d0db449517ffdb10ef, type: 3}
+--- !u!114 &7186744000105931984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4279199071631172331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c77e0402ba384d242b6f77993e6ab833, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4279199072868621119
 GameObject:
   m_ObjectHideFlags: 0

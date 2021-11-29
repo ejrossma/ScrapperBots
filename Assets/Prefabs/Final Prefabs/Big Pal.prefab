@@ -1655,6 +1655,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3362801624161871982}
   - component: {fileID: 169146882308000072}
+  - component: {fileID: 5438211289463905654}
   m_Layer: 0
   m_Name: Big Pal
   m_TagString: Friendly Unit
@@ -1710,6 +1711,18 @@ MonoBehaviour:
   moveRangeShowing: 0
   attackRangeShowing: 0
   icon: {fileID: 21300000, guid: 5722346b4f35a4d0db449517ffdb10ef, type: 3}
+--- !u!114 &5438211289463905654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8906841038495302384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddf75ccd90c0ce64d8d0cfc29294dd95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8997029393860304467
 GameObject:
   m_ObjectHideFlags: 0
