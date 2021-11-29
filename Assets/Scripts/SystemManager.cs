@@ -76,15 +76,19 @@ public class SystemManager : MonoBehaviour
                         if (unitTurnOrder[0].GetComponent<UnitController>().moveRangeShowing)
                             unitTurnOrder[0].GetComponent<UnitController>().BasicMove(hit.transform.GetComponentInParent<Tile>());
                         else if (unitTurnOrder[0].GetComponent<UnitController>().attackRangeShowing)
-                            unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<Tile>());
-                            //THIS DOESN'T WORK BECAUSE YOU DONT CLICK ON THE TILE YOU CLICK ON A UNIT
-                        
+                            unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<Tile>().position);                
                     }
                     // Click on unselected Tile
                     else
                     {
                         
                     }
+                }
+                else if (hit.transform.GetComponentInParent<UnitController>() && unitTurnOrder[0].GetComponent<UnitController>().attackRangeShowing)
+                {
+                    // Click on unit with attack range showing
+                    if(bm.GetTile(hit.transform.GetComponentInParent<UnitController>().position).GetComponent<Tile>().selected)
+                        unitTurnOrder[0].GetComponent<UnitController>().BasicAttack(hit.transform.GetComponentInParent<UnitController>().position);
                 }
                 else if (hit.transform.GetComponentInParent<UnitController>() && !unitTurnOrder[0].GetComponent<UnitController>().inActionorMovement())
                 {
@@ -174,28 +178,29 @@ public class SystemManager : MonoBehaviour
         // Activate turn UI on unit's turn, otherwise deactivate turn UI
         if (unit.isTurn && !unit.moving && !unit.acting)
         {
-            moveButton.GetComponent<Button>().enabled = !unit.alreadyMoved;
+            moveButton.GetComponent<Button>().interactable = !unit.alreadyMoved;
             moveButton.GetComponent<Button>().onClick.RemoveAllListeners();
             moveButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleMoveRange());
 
-            attackButton.GetComponent<Button>().enabled = !unit.actionUsed;
+            attackButton.GetComponent<Button>().interactable = !unit.actionUsed && unit.GetValidAttackPositions().Count > 0;
             attackButton.GetComponent<Button>().onClick.RemoveAllListeners();
             attackButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleAttackRange());
 
-            maintainActionButton.GetComponent<Button>().enabled = true;
+            maintainActionButton.GetComponent<Button>().interactable = true;
             maintainActionButton.GetComponent<Button>().onClick.RemoveAllListeners();
             maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
         }
         else
         {
-            moveButton.GetComponent<Button>().enabled = false;
-            attackButton.GetComponent<Button>().enabled = false;
+            moveButton.GetComponent<Button>().interactable = false;
+            attackButton.GetComponent<Button>().interactable = false;
+            maintainActionButton.GetComponent<Button>().interactable = false;
         }
     }
 
     public void SelectUnit(int id)
     {
-        if (id < unitTurnOrder.Count)
+        if (id < unitTurnOrder.Count && !unitTurnOrder[0].GetComponent<UnitController>().inActionorMovement())
             SelectUnit(unitTurnOrder[id].GetComponent<UnitController>());
     }
 

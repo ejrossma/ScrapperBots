@@ -136,10 +136,11 @@ public class UnitController : MonoBehaviour
         sm.SelectUnit(this);
     }
 
-    public void BasicAttack(Tile tile) 
+    public void BasicAttack(Vector2Int pos) 
     {
         Debug.Log("Attack");
         actionUsed = true;
+        ToggleAttackRange();
         sm.SelectUnit(this);
     }
 
@@ -179,6 +180,7 @@ public class UnitController : MonoBehaviour
             //else set to 180
         transform.rotation = Quaternion.Euler(0,0,0);
         moving = false;
+        sm.SelectUnit(this);
     }
 
     //calculates rotation when given a target tile to look at (can be used for attacks and movement)
@@ -430,6 +432,27 @@ public class UnitController : MonoBehaviour
         return false;
     }
 
+    private bool TileOccupiedByTarget(Transform tile)
+    {
+        if(CompareTag("Friendly Unit"))
+        {
+            foreach (GameObject unit in sm.enemyUnits)
+            {
+                if (unit.GetComponent<UnitController>().position == tile.GetComponent<Tile>().position)
+                    return true;
+            }
+        }
+        else
+        {
+            foreach (GameObject unit in sm.friendlyUnits)
+            {
+                if (unit.GetComponent<UnitController>().position == tile.GetComponent<Tile>().position)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     //based on the attack range return a list of valid attack positions
     public List<Transform> GetValidAttackPositions()
     {
@@ -459,7 +482,7 @@ public class UnitController : MonoBehaviour
         Transform above = bm.GetAdjacentTile((Vector2Int)node, Direction.ABOVE);
 
         // Check if tile is valid
-        if (above != null && bm.TileIsMovable(above) && TileOccupied(above))
+        if (above != null && bm.TileIsMovable(above) && TileOccupiedByTarget(above))
         {
             Vector2Int pos = above.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -489,7 +512,7 @@ public class UnitController : MonoBehaviour
         Transform upperRight = bm.GetAdjacentTile((Vector2Int)node, Direction.UPPER_RIGHT);
 
         // Check if tile is valid
-        if (upperRight != null && bm.TileIsMovable(upperRight) && TileOccupied(upperRight))
+        if (upperRight != null && bm.TileIsMovable(upperRight) && TileOccupiedByTarget(upperRight))
         {
             Vector2Int pos = upperRight.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -519,7 +542,7 @@ public class UnitController : MonoBehaviour
         Transform lowerRight = bm.GetAdjacentTile((Vector2Int)node, Direction.LOWER_RIGHT);
 
         // Check if tile is valid
-        if (lowerRight != null && bm.TileIsMovable(lowerRight) && TileOccupied(lowerRight))
+        if (lowerRight != null && bm.TileIsMovable(lowerRight) && TileOccupiedByTarget(lowerRight))
         {
             Vector2Int pos = lowerRight.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -549,7 +572,7 @@ public class UnitController : MonoBehaviour
         Transform below = bm.GetAdjacentTile((Vector2Int)node, Direction.BELOW);
 
         // Check if tile is valid
-        if (below != null && bm.TileIsMovable(below) && TileOccupied(below))
+        if (below != null && bm.TileIsMovable(below) && TileOccupiedByTarget(below))
         {
             Vector2Int pos = below.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -579,7 +602,7 @@ public class UnitController : MonoBehaviour
         Transform lowerLeft = bm.GetAdjacentTile((Vector2Int)node, Direction.LOWER_LEFT);
 
         // Check if tile is valid
-        if (lowerLeft != null && bm.TileIsMovable(lowerLeft) && TileOccupied(lowerLeft))
+        if (lowerLeft != null && bm.TileIsMovable(lowerLeft) && TileOccupiedByTarget(lowerLeft))
         {
             Vector2Int pos = lowerLeft.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
@@ -609,7 +632,7 @@ public class UnitController : MonoBehaviour
         Transform upperLeft = bm.GetAdjacentTile((Vector2Int)node, Direction.UPPER_LEFT);
 
         // Check if tile is valid
-        if (upperLeft != null && bm.TileIsMovable(upperLeft) && TileOccupied(upperLeft))
+        if (upperLeft != null && bm.TileIsMovable(upperLeft) && TileOccupiedByTarget(upperLeft))
         {
             Vector2Int pos = upperLeft.GetComponent<Tile>().position;
             // Check if tile is already in the list (replacing worse case nodes in conflict)
