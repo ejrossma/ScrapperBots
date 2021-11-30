@@ -59,12 +59,15 @@ public class BigPal : MonoBehaviour
             }
             uc.travelTime = 0.0f;
             uc.position = t.GetComponent<Tile>().position;
-            foreach(GameObject unit in sm.enemyUnits)
+            for(int i = 0; i < sm.enemyUnits.Count; i++)
             {
-                if(unit.GetComponent<UnitController>().position == t.GetComponent<Tile>().position)
+                UnitController unit = sm.enemyUnits[i].GetComponent<UnitController>();
+                if (unit.position == t.GetComponent<Tile>().position)
                 {
                     // Hit enemy
-                    uc.TakeDamage(unit.GetComponent<UnitController>(), 10);
+                    uc.TakeDamage(unit, 10);
+                    if (unit.isDead)
+                        i--;
                 }
             }
         }
@@ -84,7 +87,7 @@ public class BigPal : MonoBehaviour
             uc.travelTime = 0.0f;
             uc.position = t.GetComponent<Tile>().position;
 
-            if (!uc.TileOccupiedByTarget(t))
+            if (!uc.TileOccupiedByTarget(t) && bm.TileIsMovable(t))
             {
                 break;
             }
