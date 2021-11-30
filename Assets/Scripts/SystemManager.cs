@@ -100,6 +100,10 @@ public class SystemManager : MonoBehaviour
                         if (bm.GetTile(hit.transform.GetComponentInParent<UnitController>().position).GetComponent<Tile>().selected)
                             activeUnit.BasicAttack(hit.transform.GetComponentInParent<UnitController>().position);
                     }
+                    else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER)
+                    {
+                        activeUnit.GetComponent<Scrapper>().Teardown(hit.transform.GetComponentInParent<UnitController>());
+                    }
                     else if (!activeUnit.inActionorMovement())
                     {
                         // Click on unit
@@ -285,9 +289,10 @@ public class SystemManager : MonoBehaviour
                     ability2Button.GetComponentInChildren<Text>().text = "The Best Defense";
                     ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().GetValidBestDefenseRange()); //ability call here
                     break;
-                // case UnitClass.SCRAPPER:
-                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                case UnitClass.SCRAPPER:
+                    ability1Button.GetComponentInChildren<Text>().text = "Teardown"; //ability name needed
+                    ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleTeardownRange()); //ability call here
+                    break;
 
                 //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
                 //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
