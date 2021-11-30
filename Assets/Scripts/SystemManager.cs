@@ -254,23 +254,25 @@ public class SystemManager : MonoBehaviour
                 break;
 
             case UnitClass.SCRAPPER:
-                ability1Button.GetComponentInChildren<Text>().text = "Teardown"; //ability name needed
+                ability1Button.GetComponentInChildren<Text>().text = "Teardown";
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleTeardownRange()); //ability call here
                 // Set false if not enough charge
                 //NEED TO GRAY OUT IF THEY CAN'T ATTACK ANYONE
                 if (ability1Button.GetComponent<Button>().interactable && unit.CRG < 40)
                     ability1Button.GetComponent<Button>().interactable = false;
 
-                ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!"; //ability name needed
+                ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!";
                 //ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
                 break;
-                // case UnitClass.WITCH:
-                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
 
-                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-                //     break;
+            case UnitClass.WITCH:
+                ability1Button.GetComponentInChildren<Text>().text = "Mesmerize";
+                ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleMesmerizeRange()); //ability call here
+
+                ability2Button.GetComponentInChildren<Text>().text = "Corpsecall";
+                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleCorpsecallRange()); //ability call here
+                break;
+
                 // case UnitClass.ELECTROMANCER:
                 //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
                 //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
