@@ -29,7 +29,7 @@ public class BigPal : MonoBehaviour
 
         bool collideWithAlly = GenerateInterceptTiles(visited, uc.position, dir);
         ToggleInterceptRange();
-        uc.SpendCharge(GetComponent<UnitController>(), 15);
+        uc.SpendCharge(uc, 15);
         InterceptMoveEffect(visited, collideWithAlly);
         uc.actionUsed = true;
         //given a chosen direction lerp in that direction until hit a player, wall, edge of map

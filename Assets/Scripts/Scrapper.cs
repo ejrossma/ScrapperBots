@@ -25,10 +25,23 @@ public class Scrapper : MonoBehaviour
 
     public void Teardown(UnitController unit)
     {
+        Debug.Log("Scrapper's Teardown"); 
+        uc.SpendCharge(uc, 40);
+        uc.actionUsed = true;
+        transform.rotation = uc.CalculateRotation(bm.GetTile(unit.position));
+        ToggleTeardownRange();
+        sm.ToggleAbilities(uc);
         //do damage
-        //if kill
-            //pop up for instant harvest or using Catch This
-        Debug.Log("Scrapper's Teardown");
+        uc.LoseHealth(unit, uc.ATK);
+        StopCoroutine(ResetRotationAfterAttack());
+        StartCoroutine(ResetRotationAfterAttack());
+        if (unit.HP == 0)
+        {
+            //NEED TO IMPLEMENT POP UP
+                //CHOOSE ONE:
+                //HARVEST OR Here, Catch! (can only use here catch if CRG > 10)
+            Debug.Log(unit.unitName + " crumbled into scrap!");
+        }
     }
 
     public void ToggleTeardownRange()
@@ -47,5 +60,14 @@ public class Scrapper : MonoBehaviour
             bm.ChangeIndicator(Color.red);
         }
         uc.abilityOneRangeShowing = !uc.abilityOneRangeShowing;
+    }
+
+    IEnumerator ResetRotationAfterAttack() 
+    {
+        
+        yield return new WaitForSeconds(0.75f);
+
+        transform.rotation = Quaternion.Euler(0,0,0);
+
     }    
 }
