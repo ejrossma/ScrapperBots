@@ -177,8 +177,9 @@ public class SystemManager : MonoBehaviour
         foreach (GameObject g in activeUnits)
         {
             g.GetComponent<UnitController>().heldAction = false;
-            g.GetComponent<UnitController>().alreadyMoved = false;
             g.GetComponent<UnitController>().actionUsed = false;
+            g.GetComponent<UnitController>().alreadyMoved = false;
+            g.GetComponent<UnitController>().isMesmerized = false;
             unitTurnOrder.Add(g);
         }
 
@@ -337,6 +338,8 @@ public class SystemManager : MonoBehaviour
 
                 overloadButton.GetComponentInChildren<Text>().text = "Sacrifice (Meltdown)";
                 overloadButton.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleSacrificeRange()); //ability call here
+                if (overloadButton.GetComponent<Button>().interactable && !unit.AreAliveAllies())
+                    overloadButton.GetComponent<Button>().interactable = false;
                 break;
 
             case UnitClass.SCRAPPER:
@@ -362,14 +365,19 @@ public class SystemManager : MonoBehaviour
                 ability1Button.GetComponentInChildren<Text>().text = "Mesmerize";
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleMesmerizeRange()); //ability call here
                 //Set false if not enough resource to use
-                if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 20 || unit.GetComponent<Witch>().GetValidMesmerizeRange().Count == 0 || unit.actionUsed))
+                if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 20 || unit.GetComponent<Witch>().GetValidMesmerizeRange().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "Corpsecall";
                 ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleCorpsecallRange()); //ability call here
                 // Set false if not enough resource to use
-                if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetComponent<Witch>().GetValidCorpsecallRange().Count == 0 || unit.actionUsed))
-                    ability2Button.GetComponent<Button>().interactable = false;                
+                if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetComponent<Witch>().GetValidCorpsecallRange().Count == 0))
+                    ability2Button.GetComponent<Button>().interactable = false;
+
+                overloadButton.GetComponentInChildren<Text>().text = "Necromancy (Meltdown)";
+                overloadButton.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().Necromancy()); //ability call here
+                if (overloadButton.GetComponent<Button>().interactable && unit.GetRevivableDeadAllies().Count == 0)
+                    overloadButton.GetComponent<Button>().interactable = false;
                 break;
 
                 // case UnitClass.ELECTROMANCER:

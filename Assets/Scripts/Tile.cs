@@ -14,6 +14,7 @@ public class Tile : MonoBehaviour
     public int h;
     public Tile parent;
     private TileType originalType;
+    public UnitController ghost;
 
     private void Start()
     {
@@ -32,5 +33,17 @@ public class Tile : MonoBehaviour
     {
         tileType = originalType;
         transform.GetChild(2).gameObject.SetActive(tileType == TileType.RUINED_MACHINE);
+    }
+
+    public void SetGhost(UnitController unit)
+    {
+        ghost = unit;
+    }
+
+    public int GetGhostAttack()
+    {
+        if (ghost != null)
+            return ghost.ATK;
+        return -1;
     }
 }

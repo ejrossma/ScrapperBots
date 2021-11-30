@@ -34,6 +34,7 @@ public class UnitController : MonoBehaviour
     public bool harvestRangeShowing;
     public Sprite icon;
     public bool isDead;
+    public bool isMesmerized;
 
     //time elasped for Lerp
     public float travelTime;
@@ -54,6 +55,8 @@ public class UnitController : MonoBehaviour
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
         MoveToTile(position);
+        if (unitClass != UnitClass.WITCH)
+            Die(this);
     }
 
     private void Update()
@@ -64,6 +67,8 @@ public class UnitController : MonoBehaviour
     public void SetTurn()
     {
         isTurn = true;
+        if (isMesmerized)
+            alreadyMoved = true;
         moveRangeShowing = false;
         attackRangeShowing = false;
         abilityOneRangeShowing = false;
@@ -189,7 +194,9 @@ public class UnitController : MonoBehaviour
         Debug.Log(unit.unitName + " has died!");
         unit.HP = 0;
         unit.isDead = true;
-        bm.GetTile(unit.position).GetComponent<Tile>().ChangeTile(TileType.RUINED_MACHINE);
+        Tile tile = bm.GetTile(unit.position).GetComponent<Tile>();
+        tile.ChangeTile(TileType.RUINED_MACHINE);
+        tile.SetGhost(unit);
         sm.activeUnits.Remove(unit.gameObject);
         if(unit.CompareTag("Friendly Unit"))
             sm.friendlyUnits.Remove(unit.gameObject);
@@ -207,21 +214,22 @@ public class UnitController : MonoBehaviour
     public void Revive(UnitController unit)
     {
         Debug.Log(unitName + " has revived " + unit.unitName + "!");
-        //unit.HP = 0;
-        //unit.isDead = true;
-        //bm.GetTile(unit.position).GetComponent<Tile>().ChangeTile(TileType.RUINED_MACHINE);
-        //sm.activeUnits.Remove(unit.gameObject);
-        //if (unit.CompareTag("Friendly Unit"))
-        //    sm.friendlyUnits.Remove(unit.gameObject);
-        //else
-        //    sm.enemyUnits.Remove(unit.gameObject);
-        //sm.deadUnits.Add(unit.gameObject);
-        //if (sm.unitTurnOrder.Contains(unit.gameObject))
-        //{
-        //    sm.unitTurnOrder.Remove(unit.gameObject);
-        //    sm.UpdateTurnOrderDisplay();
-        //}
-        //unit.transform.GetChild(0).gameObject.SetActive(false);
+        unit.HP = 1;
+        unit.isDead = false;
+        bm.GetTile(unit.position).GetComponent<Tile>().RevertTile();
+        sm.activeUnits.Add(unit.gameObject);
+        if (unit.CompareTag("Friendly Unit"))
+            sm.friendlyUnits.Add(unit.gameObject);
+        else
+            sm.enemyUnits.Add(unit.gameObject);
+        sm.deadUnits.Remove(unit.gameObject);
+        sm.unitTurnOrder.Insert(1, unit.gameObject);
+        unit.heldAction = false;
+        unit.actionUsed = false;
+        unit.alreadyMoved = false;
+        unit.isMesmerized = false;
+        sm.UpdateTurnOrderDisplay();
+        unit.transform.GetChild(0).gameObject.SetActive(true);
     }
 
     public void LoseHealth(UnitController unit, int damage) 
@@ -377,6 +385,20 @@ public class UnitController : MonoBehaviour
 
         Debug.Log("Direction not found!");
         return Direction.ABOVE;
+    }
+
+    public Direction InvertDirection(Direction direction)
+    {
+        return direction switch
+        {
+            Direction.ABOVE => Direction.BELOW,
+            Direction.UPPER_RIGHT => Direction.LOWER_LEFT,
+            Direction.LOWER_RIGHT => Direction.UPPER_LEFT,
+            Direction.BELOW => Direction.ABOVE,
+            Direction.LOWER_LEFT => Direction.UPPER_RIGHT,
+            Direction.UPPER_LEFT => Direction.LOWER_RIGHT,
+            _ => Direction.ABOVE
+        };
     }
 
     public List<Transform> GetValidMovePositions()
@@ -861,5 +883,23 @@ public class UnitController : MonoBehaviour
         actionUsed = true;
         ToggleHarvestRange();
         sm.SelectUnit(this);
+    }
+
+    public List<GameObject> GetRevivableDeadAllies()
+    {
+        List<GameObject> allies = new List<GameObject>();
+
+        foreach(GameObject g in sm.deadUnits)
+        {
+            Transform tile = bm.GetTile(g.GetComponent<UnitController>().position);
+            if (tile != null && tile.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+                allies.Add(g);
+        }
+        return allies;
+    }
+
+    public bool AreAliveAllies()
+    {
+        return sm.friendlyUnits.Count > 1;
     }
 }

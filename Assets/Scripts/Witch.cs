@@ -20,33 +20,60 @@ public class Witch : MonoBehaviour
         uc = GetComponentInParent<UnitController>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     //basic ability
-        //DIDNT IMPLEMENT NOT MOVING UNTIL END OF NEXT TURN
     public void Mesmerize(UnitController unit)
     {
-        Debug.Log("Witch is using Mesmerize on " + unit.unitName + "!");
         mesmerizedUnit = unit;
         selectUnitToMesmerize = true;
-        //pan camera to mesmerized unit
-        Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(unit.transform.position.x, 10, unit.transform.position.z - 4.5f));
-        //calculate movement around unit and toggle it
-        unit.ToggleMoveRange();
+        bm.DeselectTiles();
+        bm.ChangeIndicator(Color.blue);
+        bm.SelectTiles(unit.GetValidMovePositions());
         sm.SelectUnit(mesmerizedUnit);
     }
 
     //call when player selects movement
     public void MesmerizeMovement(Tile tile) {
-        sm.SelectUnit(mesmerizedUnit);
-        mesmerizedUnit.BasicMove(tile);
+        mesmerizedUnit.isMesmerized = true;
+        MesmerizeMoveEffect(tile);
         uc.actionUsed = true;
-        mesmerizedUnit = null;
-        selectUnitToMesmerize = false;
+        uc.SpendCharge(uc, 20);
+        ToggleMesmerizeRange();
+        sm.SelectUnit(mesmerizedUnit);
+    }
+
+    public void MesmerizeMoveEffect(Tile tile)
+    {
+        mesmerizedUnit.moving = true;
+        List<Transform> a = mesmerizedUnit.PathfindToTile(tile.position);
+        //start lerping
+        IEnumerator move = MesmerizeInterpolateUnit(mesmerizedUnit, a);
+        StopCoroutine(move);
+        StartCoroutine(move);
+    }
+
+    IEnumerator MesmerizeInterpolateUnit(UnitController unit, List<Transform> tiles)
+    {
+        foreach (Transform t in tiles)
+        {
+            Vector3 start = unit.transform.position;
+            //calculate rotation
+            unit.transform.rotation = unit.CalculateRotation(t);
+            while (unit.travelTime < unit.waitTime)  //condition for interpolation
+            {
+                unit.transform.position = Vector3.Lerp(start, t.transform.position, unit.travelTime / unit.waitTime);
+                unit.travelTime += Time.deltaTime;
+                Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(unit.transform.position.x, 10, unit.transform.position.z - 4.5f));
+                yield return null;
+            }
+            unit.travelTime = 0.0f;
+            unit.position = t.GetComponent<Tile>().position;
+        }
+        //End for testing purposes
+        //if friendly set y to 0 
+        //else set to 180
+        unit.transform.rotation = Quaternion.Euler(0, 0, 0);
+        unit.moving = false;
+        sm.SelectUnit(uc);
     }
 
     public void ToggleMesmerizeRange() 
@@ -62,6 +89,8 @@ public class Witch : MonoBehaviour
             uc.abilityTwoRangeShowing = false;
             uc.meltdownRangeShowing = false;
             uc.harvestRangeShowing = false;
+            selectUnitToMesmerize = false;
+            mesmerizedUnit = null;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidMesmerizeRange());
             bm.ChangeIndicator(Color.red);
@@ -110,9 +139,40 @@ public class Witch : MonoBehaviour
     //basic ability
     public void Corpsecall(Tile tile)
     {
-        Debug.Log("Witch is using Corpsecall!");
+        Direction direction = uc.InvertDirection(uc.CalculateDirection(tile.transform));
+        uc.SpendCharge(uc, 10);
+        MarchCorpseCall(tile, tile, direction);
+        ToggleCorpsecallRange();
         uc.actionUsed = true;
         sm.SelectUnit(uc);
+    }
+
+    public void MarchCorpseCall(Tile originTile, Tile tile, Direction direction)
+    {
+        UnitController unit = sm.GetUnit(tile.position);
+        if (unit != null)
+        {
+            if(unit.CompareTag("Friendly Unit"))
+            {
+                // Stop an harvest for friendly
+                originTile.RevertTile();
+                uc.RecoverArmor(unit, unit.MAXAMR - unit.AMR);
+                uc.RecoverCharge(unit, unit.MAXCRG - unit.CRG);
+                return;
+            }
+            else
+            {
+                int atk = originTile.GetGhostAttack();
+                if(atk < 0)
+                    uc.TakeDamage(unit, uc.ATK);
+                else
+                    uc.TakeDamage(unit, atk);
+            }
+        }
+        Transform temp = bm.GetAdjacentTile(tile.position, direction);
+        if (temp == null)
+            return;
+        MarchCorpseCall(originTile, temp.GetComponent<Tile>(), direction);
     }
 
     public void ToggleCorpsecallRange() 
@@ -174,5 +234,12 @@ public class Witch : MonoBehaviour
     public void Necromancy()
     {
         Debug.Log("Witch has triggered their meltdown and is using Necromancy!");
+        List<GameObject> revivableAllies = uc.GetRevivableDeadAllies();
+        foreach(GameObject g in revivableAllies)
+        {
+            uc.Revive(g.GetComponent<UnitController>());
+        }
+        uc.actionUsed = true;
+        uc.Meltdown();
     }
 }
