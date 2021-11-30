@@ -41,6 +41,7 @@ public class SystemManager : MonoBehaviour
     public GameObject ability1Button;
     public GameObject ability2Button;
     public GameObject closeSkillsPanelButton;
+    public GameObject hereCatchPopup;
 
     private int turnCount;
     private BoardManager bm;
@@ -54,6 +55,7 @@ public class SystemManager : MonoBehaviour
         foreach (GameObject g in units)
             enemyUnits.Add(g);
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
+        hereCatchPopup.SetActive(false);
         GetActiveUnits();
     }
 
@@ -93,6 +95,8 @@ public class SystemManager : MonoBehaviour
                             activeUnit.Harvest(hit.transform.GetComponentInParent<Tile>().position);
                         else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.BIG_PAL)
                             activeUnit.GetComponent<BigPal>().Intercept(activeUnit.CalculateDirection(hit.transform.GetComponentInParent<Tile>().transform));
+                        else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER && activeUnit.GetComponent<Scrapper>().hereCatchPhase == 1)
+                            activeUnit.GetComponent<Scrapper>().HereCatchPhase1(hit.transform.GetComponentInParent<Tile>().position);
 
                     }
                     // Click on unselected Tile
@@ -117,6 +121,10 @@ public class SystemManager : MonoBehaviour
                     else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER)
                     {
                         activeUnit.GetComponent<Scrapper>().Teardown(hit.transform.GetComponentInParent<UnitController>());
+                    }
+                    else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER && activeUnit.GetComponent<Scrapper>().hereCatchPhase == 2)
+                    {
+                        activeUnit.GetComponent<Scrapper>().HereCatchPhase2(hit.transform.GetComponentInParent<UnitController>().position);
                     }
                     else if (!activeUnit.inActionorMovement())
                     {
@@ -262,7 +270,15 @@ public class SystemManager : MonoBehaviour
 
             // FROM OTHER FUNCTION
             closeSkillsPanelButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => { skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf); bm.DeselectTiles(); });
+            closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => {
+                unit.moveRangeShowing = false;
+                unit.attackRangeShowing = false;
+                unit.abilityOneRangeShowing = false;
+                unit.meltdownRangeShowing = false;
+                unit.harvestRangeShowing = false;
+                skillsPanel.SetActive(!skillsPanel.activeSelf);
+                secondPanel.SetActive(!secondPanel.activeSelf);
+                bm.DeselectTiles(); });
             
             ability1Button.GetComponent<Button>().interactable = !unit.actionUsed;
             ability2Button.GetComponent<Button>().interactable = !unit.actionUsed;
@@ -305,10 +321,15 @@ public class SystemManager : MonoBehaviour
             case UnitClass.SCRAPPER:
                 ability1Button.GetComponentInChildren<Text>().text = "Teardown"; //ability name needed
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleTeardownRange()); //ability call here
-                // Set false if not enough charge
-                //NEED TO GRAY OUT IF THEY CAN'T ATTACK ANYONE
+                // Set false if not enough resource to use
                 if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 40 || unit.GetValidAttackPositions().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
+
+                ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!";
+                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleHereCatchRange()); //ability call here
+                // Set false if not enough resource to use
+                if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetValidHarvestPositions().Count == 0 || unit.GetComponent<Scrapper>().GetValidHereCatchPositions().Count == 0))
+                    ability2Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!"; //ability name needed
                 //ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here

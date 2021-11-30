@@ -26,9 +26,6 @@ public class BigPal : MonoBehaviour
         uc.SpendCharge(uc, 15);
         InterceptMoveEffect(visited, collideWithAlly);
         uc.actionUsed = true;
-        //given a chosen direction lerp in that direction until hit a player, wall, edge of map
-        //update enemies and players hit depending on what ability says
-        //check tile in dir to see if friendly unit stopped the charge
     }
 
     public void InterceptMoveEffect(List<Vector2Int> visited, bool collideWithAlly)

@@ -204,6 +204,26 @@ public class UnitController : MonoBehaviour
         unit.transform.GetChild(0).gameObject.SetActive(false);
     }
 
+    public void Revive(UnitController unit)
+    {
+        Debug.Log(unitName + " has revived " + unit.unitName + "!");
+        //unit.HP = 0;
+        //unit.isDead = true;
+        //bm.GetTile(unit.position).GetComponent<Tile>().ChangeTile(TileType.RUINED_MACHINE);
+        //sm.activeUnits.Remove(unit.gameObject);
+        //if (unit.CompareTag("Friendly Unit"))
+        //    sm.friendlyUnits.Remove(unit.gameObject);
+        //else
+        //    sm.enemyUnits.Remove(unit.gameObject);
+        //sm.deadUnits.Add(unit.gameObject);
+        //if (sm.unitTurnOrder.Contains(unit.gameObject))
+        //{
+        //    sm.unitTurnOrder.Remove(unit.gameObject);
+        //    sm.UpdateTurnOrderDisplay();
+        //}
+        //unit.transform.GetChild(0).gameObject.SetActive(false);
+    }
+
     public void LoseHealth(UnitController unit, int damage) 
     {
         Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
