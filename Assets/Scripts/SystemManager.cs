@@ -335,17 +335,21 @@ public class SystemManager : MonoBehaviour
                 // Set false if not enough resource to use
                 if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetValidHarvestPositions().Count == 0 || unit.GetComponent<Scrapper>().GetValidHereCatchPositions().Count == 0))
                     ability2Button.GetComponent<Button>().interactable = false;
-
-                ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!"; //ability name needed
-                //ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
                 break;
-                // case UnitClass.WITCH:
-                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
 
-                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-                //     break;
+            case UnitClass.WITCH:
+                ability1Button.GetComponentInChildren<Text>().text = "Mesmerize";
+                ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleMesmerizeRange()); //ability call here
+                // Set false if not enough resource to use
+                // if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 20 || unit.GetValidMesmerizePositions().Count == 0))
+                //     ability1Button.GetComponent<Button>().interactable = false;
+
+                ability2Button.GetComponentInChildren<Text>().text = "Corpsecall";
+                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleCorpsecallRange()); //ability call here
+                // Set false if not enough resource to use
+                // if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetValidMesmerizePositions().Count == 0))
+                //     ability2Button.GetComponent<Button>().interactable = false;                
+                break;
                 // case UnitClass.ELECTROMANCER:
                 //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
                 //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
