@@ -42,6 +42,34 @@ public class SystemManager : MonoBehaviour
     public GameObject ability2Button;
     public GameObject closeSkillsPanelButton;
     public GameObject hereCatchPopup;
+    public GameObject showDetailedStats;
+    public GameObject hideDetailedStats;
+    public GameObject bottomUIBar;
+    public GameObject helpUI;
+    public GameObject sideUIBar;
+    public GameObject showCharacterOverview;
+    public GameObject hideCharacterOverview;
+
+    public Text topCharacterOverviewArmorText;
+    public Text topCharacterOverviewHealthText;
+    public Text topCharacterOverviewChargeText;
+    public GameObject topCharacterOverviewArmorBar;
+    public GameObject topCharacterOverviewHealthBar;
+    public GameObject topCharacterOverviewChargeBar;
+
+    public Text middleCharacterOverviewArmorText;
+    public Text middleCharacterOverviewHealthText;
+    public Text middleCharacterOverviewChargeText;
+    public GameObject middleCharacterOverviewArmorBar;
+    public GameObject middleCharacterOverviewHealthBar;
+    public GameObject middleCharacterOverviewChargeBar;    
+
+    public Text bottomCharacterOverviewArmorText;
+    public Text bottomCharacterOverviewHealthText;
+    public Text bottomCharacterOverviewChargeText;
+    public GameObject bottomCharacterOverviewArmorBar;
+    public GameObject bottomCharacterOverviewHealthBar;
+    public GameObject bottomCharacterOverviewChargeBar; 
 
     private int turnCount;
     private BoardManager bm;
@@ -250,6 +278,7 @@ public class SystemManager : MonoBehaviour
         }
 
         UpdateStats(unit);
+        UpdateCharacterOverview();
         Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(unit.gameObject.transform.position.x, 10, unit.gameObject.transform.position.z - 4.5f));
         // Activate turn UI on unit's turn, otherwise deactivate turn UI
         if (unit.isTurn && !unit.moving && !unit.acting)
@@ -425,7 +454,7 @@ public class SystemManager : MonoBehaviour
         displayName.text = unit.unitName;
         displayHealth.text = "Health: " + unit.HP;
         displayArmor.text = "Armor: " + unit.AMR;
-        displayBattery.text = "Battery: " + unit.CRG;
+        displayBattery.text = "Charge: " + unit.CRG;
         displayMovement.text = "Movement: " + unit.SPD;
         displayThreads.text = "Threads: " + unit.TRD;
         displayAttack.text = "Attack: " + unit.ATK;
@@ -433,8 +462,73 @@ public class SystemManager : MonoBehaviour
         displayDebuffs.text = "Debuffs:";
     }
 
+    public void UpdateCharacterOverview() 
+    {
+        int count = 1;
+        foreach (GameObject g in friendlyUnits) {
+            UpdateCharacterOverviewStats(g.GetComponent<UnitController>(), count);
+            count++;
+        }
+    }
+
+    private void UpdateCharacterOverviewStats(UnitController uc, int count)
+    {
+        if (count == 1)
+        {
+            //top of 3
+            topCharacterOverviewArmorText.text = uc.AMR + "/" + uc.MAXAMR;
+            topCharacterOverviewHealthText.text = uc.HP + "/" + uc.MAXHP;
+            topCharacterOverviewChargeText.text = uc.CRG + "/" + uc.MAXCRG;
+
+            topCharacterOverviewArmorBar.GetComponent<Image>().fillAmount = (float)uc.AMR / (float)uc.MAXAMR;
+            topCharacterOverviewHealthBar.GetComponent<Image>().fillAmount = (float)uc.HP / (float)uc.MAXHP;
+            topCharacterOverviewChargeBar.GetComponent<Image>().fillAmount = (float)uc.CRG / (float)uc.MAXCRG;
+        }
+        else if (count == 2)
+        {
+            //middle of 3
+            middleCharacterOverviewArmorText.text = uc.AMR + "/" + uc.MAXAMR;
+            middleCharacterOverviewHealthText.text = uc.HP + "/" + uc.MAXHP;
+            middleCharacterOverviewChargeText.text = uc.CRG + "/" + uc.MAXCRG;
+            
+            middleCharacterOverviewArmorBar.GetComponent<Image>().fillAmount = (float)uc.AMR / (float)uc.MAXAMR;
+            middleCharacterOverviewHealthBar.GetComponent<Image>().fillAmount = (float)uc.HP / (float)uc.MAXHP;
+            middleCharacterOverviewChargeBar.GetComponent<Image>().fillAmount = (float)uc.CRG / (float)uc.MAXCRG;                        
+        }
+        else if (count == 3)
+        {
+            //bottom of 3
+            bottomCharacterOverviewArmorText.text = uc.AMR + "/" + uc.MAXAMR;
+            bottomCharacterOverviewHealthText.text = uc.HP + "/" + uc.MAXHP;
+            bottomCharacterOverviewChargeText.text = uc.CRG + "/" + uc.MAXCRG;
+
+            bottomCharacterOverviewArmorBar.GetComponent<Image>().fillAmount = (float)uc.AMR / (float)uc.MAXAMR;
+            bottomCharacterOverviewHealthBar.GetComponent<Image>().fillAmount = (float)uc.HP / (float)uc.MAXHP;
+            bottomCharacterOverviewChargeBar.GetComponent<Image>().fillAmount = (float)uc.CRG / (float)uc.MAXCRG;
+        }
+    }
+
     public void ToggleAbilities(UnitController unit)
     {
         skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf);
+    }
+
+    public void ToggleDetailedStats() 
+    {
+        showDetailedStats.SetActive(!showDetailedStats.activeSelf);
+        hideDetailedStats.SetActive(!hideDetailedStats.activeSelf);
+        bottomUIBar.SetActive(!bottomUIBar.activeSelf);
+    }
+
+    public void ToggleCharacterOverview() 
+    {
+        showCharacterOverview.SetActive(!showCharacterOverview.activeSelf);
+        hideCharacterOverview.SetActive(!hideCharacterOverview.activeSelf);
+        sideUIBar.SetActive(!sideUIBar.activeSelf);
+    }    
+
+    public void ToggleHelpUI()
+    {
+        helpUI.SetActive(!helpUI.activeSelf);
     }
 }

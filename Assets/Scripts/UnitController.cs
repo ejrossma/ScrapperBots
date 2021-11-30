@@ -62,7 +62,7 @@ public class UnitController : MonoBehaviour
 
     }
 
-    public void SetTurn()
+    public void SetTurn() 
     {
         isTurn = true;
         if (isMesmerized)
