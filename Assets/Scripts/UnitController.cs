@@ -10,9 +10,12 @@ public class UnitController : MonoBehaviour
     public UnitClass unitClass;
     public int LVL; //level
     public int HP; //hit points
+    public int MAXHP;
     public int ATK; //attack
     public int AMR; //armor
+    public int MAXAMR;
     public int CRG; //charge
+    public int MAXCRG;
     public int SPD; //speed
     public int TRD; //threads
     public int ATKRNG; //attack range
@@ -30,9 +33,9 @@ public class UnitController : MonoBehaviour
     public Sprite icon;
 
     //time elasped for Lerp
-    private float travelTime;
+    public float travelTime;
     //goal time for Lerp
-    private float waitTime;
+    public float waitTime;
 
     private BoardManager bm;
     private SystemManager sm;
@@ -119,22 +122,25 @@ public class UnitController : MonoBehaviour
     public void BasicMove(Tile tile)
     {
         ToggleMoveRange();
+        MoveEffect(tile);
+        alreadyMoved = true;
+    }
+
+    public void MoveEffect(Tile tile)
+    {
         moving = true;
         List<Transform> a = PathfindToTile(tile.position);
         //start lerping
         IEnumerator move = InterpolateUnit(a);
         StopCoroutine(move);
         StartCoroutine(move);
-        alreadyMoved = true;
-        sm.SelectUnit(this);
     }
 
     public void BasicAttack(Vector2Int pos) 
     {
         //get unit at pos
         UnitController unit = sm.GetUnit(pos);
-        Debug.Log(unitName + " attacked " + unit.unitName + " for " + ATK + "!");
-        transform.rotation = calculateRotation(bm.GetTile(pos));
+        transform.rotation = CalculateRotation(bm.GetTile(pos));
         StopCoroutine(ResetRotationAfterAttack());
         StartCoroutine(ResetRotationAfterAttack());
         LoseHealth(unit, ATK);
@@ -152,11 +158,26 @@ public class UnitController : MonoBehaviour
 
     }
 
-    private void LoseHealth(UnitController unit, int damage) 
+    public void LoseHealth(UnitController unit, int damage) 
     {
+        Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
         unit.HP -= damage;
         if (unit.HP < 0)
             unit.HP = 0;
+    }
+
+    public void RecoverCharge(UnitController unit, int amount)
+    {
+        Debug.Log(unit.unitName + " recovered " + amount + " charge!");
+        unit.CRG += amount;
+        if (unit.CRG > unit.MAXCRG)
+            unit.CRG = MAXCRG;
+    }
+
+    public void SpendCharge(UnitController unit, int amount)
+    {
+        Debug.Log(unit.unitName + " spent " + amount + " charge!");
+        unit.CRG -= amount;
     }
 
     public void MoveToTile(Vector2Int pos)
@@ -179,7 +200,7 @@ public class UnitController : MonoBehaviour
         {
             Vector3 start = transform.position;
             //calculate rotation
-            transform.rotation = calculateRotation(t);
+            transform.rotation = CalculateRotation(t);
             while (travelTime < waitTime)  //condition for interpolation
             {
                 transform.position = Vector3.Lerp(start, t.transform.position, (travelTime / waitTime));
@@ -199,7 +220,7 @@ public class UnitController : MonoBehaviour
     }
 
     //calculates rotation when given a target tile to look at (can be used for attacks and movement)
-    public Quaternion calculateRotation(Transform tile) 
+    public Quaternion CalculateRotation(Transform tile) 
     {
         //when x is odd lower is in same row
         //when x is even higher is in same row
@@ -233,23 +254,26 @@ public class UnitController : MonoBehaviour
     }
 
     //calculates direction when given a target tile
-    public Direction calculateDirection(Transform tile) 
+    public Direction CalculateDirection(Transform tile) 
     {
-        Vector2Int t = tile.GetComponent<Tile>().position;
-        if ((position.x % 2 != 0 && position.x > t.x && position.y < t.y) || (position.x % 2 == 0 && position.x > t.x && position.y == t.y)) //upper left
-            return Direction.UPPER_LEFT;
-        else if ((position.x % 2 != 0 && position.x > t.x && position.y == t.y) || (position.x % 2 == 0 && position.x > t.x && position.y > t.y))  //lower left
-            return Direction.LOWER_LEFT;
-        else if (position.x == t.x && position.y < t.y)  //forward
+        Vector3Int currentTile = bm.GetTile(position).GetComponent<Tile>().nodePosition;
+        Vector3Int targetTile = tile.GetComponent<Tile>().nodePosition;
+
+        if (targetTile.y > currentTile.y && targetTile.z < currentTile.z)
             return Direction.ABOVE;
-        else if (position.x == t.x && position.y > t.y)  //backward
-            return Direction.BELOW;
-        else if ((position.x % 2 != 0 && position.x < t.x && position.y < t.y) || (position.x % 2 == 0 && position.x < t.x && position.y == t.y))  //upper right
+        else if (targetTile.x > currentTile.x && targetTile.z < currentTile.z)
             return Direction.UPPER_RIGHT;
-        else if ((position.x % 2 != 0 && position.x < t.x && position.y == t.y) || (position.x % 2 == 0 && position.x < t.x && position.y > t.y))  //lower right
+        else if (targetTile.x > currentTile.x && targetTile.y < currentTile.y)
             return Direction.LOWER_RIGHT;
-        
-        return Direction.UPPER_RIGHT;
+        else if (targetTile.z > currentTile.z && targetTile.y < currentTile.y)
+            return Direction.BELOW;
+        else if (targetTile.z > currentTile.z && targetTile.x < currentTile.x)
+            return Direction.LOWER_LEFT;
+        else if (targetTile.y > currentTile.y && targetTile.x < currentTile.x)
+            return Direction.UPPER_LEFT;
+
+        Debug.Log("Direction not found!");
+        return Direction.ABOVE;
     }
 
     public List<Transform> GetValidMovePositions()

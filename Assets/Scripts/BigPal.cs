@@ -27,17 +27,69 @@ public class BigPal : MonoBehaviour
     {
         List<Vector2Int> visited = new List<Vector2Int>();
 
-        Transform target = GenerateInterceptTiles(visited, uc.position, dir);
-        Debug.Log(target.GetComponent<Tile>().position);
-        bm.DeselectTiles();
+        bool collideWithAlly = GenerateInterceptTiles(visited, uc.position, dir);
+        ToggleInterceptRange();
+        uc.SpendCharge(GetComponent<UnitController>(), 15);
+        InterceptMoveEffect(visited, collideWithAlly);
+        uc.actionUsed = true;
         //given a chosen direction lerp in that direction until hit a player, wall, edge of map
         //update enemies and players hit depending on what ability says
         //check tile in dir to see if friendly unit stopped the charge
     }
 
+    public void InterceptMoveEffect(List<Vector2Int> visited, bool collideWithAlly)
+    {
+        uc.moving = true;
+
+        List<Transform> a = new List<Transform>();
+        foreach(Vector2Int v in visited)
+        {
+            a.Add(bm.GetTile(v));
+        }
+        //start lerping
+        IEnumerator move = InterceptInterpolateUnit(a, collideWithAlly);
+        StopCoroutine(move);
+        StartCoroutine(move);
+    }
+
+    IEnumerator InterceptInterpolateUnit(List<Transform> tiles, bool collideWithAlly)
+    {
+        foreach (Transform t in tiles)
+        {
+            Vector3 start = transform.position;
+            //calculate rotation
+            transform.rotation = uc.CalculateRotation(t);
+            while (uc.travelTime < uc.waitTime)  //condition for interpolation
+            {
+                transform.position = Vector3.Lerp(start, t.transform.position, uc.travelTime / uc.waitTime);
+                uc.travelTime += Time.deltaTime;
+                Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(transform.position.x, 10, transform.position.z - 4.5f));
+                yield return null;
+            }
+            uc.travelTime = 0.0f;
+            uc.position = t.GetComponent<Tile>().position;
+            foreach(GameObject unit in sm.enemyUnits)
+            {
+                if(unit.GetComponent<UnitController>().position == t.GetComponent<Tile>().position)
+                {
+                    // Hit enemy
+                    uc.LoseHealth(unit.GetComponent<UnitController>(), 10);
+                }
+            }
+        }
+        //End for testing purposes
+        //if friendly set y to 0 
+        //else set to 180
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+        uc.moving = false;
+        if (collideWithAlly)
+            uc.RecoverCharge(GetComponent<UnitController>(), 10);
+        sm.SelectUnit(uc);
+    }
+
     public void ToggleInterceptRange()
     {
-        if (GetComponent<UnitController>().attackRangeShowing) 
+        if (GetComponent<UnitController>().abilityOneRangeShowing) 
         {
             bm.DeselectTiles();
         }
@@ -77,19 +129,17 @@ public class BigPal : MonoBehaviour
         return tiles;
     }
 
-    private Transform GenerateInterceptTiles(List<Vector2Int> visited, Vector2Int node, Direction dir) 
+    private bool GenerateInterceptTiles(List<Vector2Int> visited, Vector2Int node, Direction dir) 
     {
         //return statement
-        Transform tile = bm.GetTile(node);
-        if (bm.TileIsMovable(tile) && (!uc.TileOccupiedByFriendly(tile) || node == GetComponent<UnitController>().position))
-            visited.Add(node);
-        else
-            return bm.GetTile(node);
+        visited.Add(node);
 
-        Transform temp = bm.GetAdjacentTile(node, dir);
-        if (temp == null)
-            return bm.GetTile(node);
-        return GenerateInterceptTiles(visited, temp.GetComponent<Tile>().position, dir);    
+        Transform tile = bm.GetAdjacentTile(node, dir);
+        if (tile == null || !bm.TileIsMovable(tile))
+            return false;
+        if (uc.TileOccupiedByFriendly(tile))
+            return true;
+        return GenerateInterceptTiles(visited, tile.GetComponent<Tile>().position, dir);    
     }
 
     //basic ability

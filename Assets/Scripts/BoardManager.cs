@@ -49,8 +49,8 @@ public class BoardManager : MonoBehaviour
             Direction.UPPER_RIGHT => GetTile(new Vector2Int(position.x + 1, position.x % 2 == 0 ? position.y : position.y + 1)),
             Direction.LOWER_RIGHT => GetTile(new Vector2Int(position.x + 1, position.x % 2 == 0 ? position.y - 1 : position.y)),
             Direction.BELOW => GetTile(new Vector2Int(position.x, position.y - 1)),
-            Direction.LOWER_LEFT => GetTile(new Vector2Int(position.x - 1, position.x % 2 == 0 ? position.y : position.y + 1)),
-            Direction.UPPER_LEFT => GetTile(new Vector2Int(position.x - 1, position.x % 2 == 0 ? position.y - 1 : position.y)),
+            Direction.LOWER_LEFT => GetTile(new Vector2Int(position.x - 1, position.x % 2 == 0 ? position.y - 1 : position.y)),
+            Direction.UPPER_LEFT => GetTile(new Vector2Int(position.x - 1, position.x % 2 == 0 ? position.y : position.y + 1)),
             _ => null
         };
     }
