@@ -110,10 +110,11 @@ public class BigPal : MonoBehaviour
         }
         else
         {
-            GetComponent<UnitController>().moveRangeShowing = false;
-            GetComponent<UnitController>().attackRangeShowing = false;
-            GetComponent<UnitController>().abilityTwoRangeShowing = false;
-            GetComponent<UnitController>().meltdownRangeShowing = false;
+            uc.moveRangeShowing = false;
+            uc.attackRangeShowing = false;
+            uc.abilityTwoRangeShowing = false;
+            uc.meltdownRangeShowing = false;
+            uc.harvestRangeShowing = false;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidInterceptionRange());
             bm.ChangeIndicator(Color.blue);
@@ -203,10 +204,11 @@ public class BigPal : MonoBehaviour
         }
         else
         {
-            GetComponent<UnitController>().moveRangeShowing = false;
-            GetComponent<UnitController>().attackRangeShowing = false;
-            GetComponent<UnitController>().abilityOneRangeShowing = false;
-            GetComponent<UnitController>().abilityTwoRangeShowing = false;
+            uc.moveRangeShowing = false;
+            uc.attackRangeShowing = false;
+            uc.abilityOneRangeShowing = false;
+            uc.abilityTwoRangeShowing = false;
+            uc.harvestRangeShowing = false;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidSacrificeRange());
             bm.ChangeIndicator(Color.blue);

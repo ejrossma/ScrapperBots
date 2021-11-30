@@ -17,7 +17,8 @@ public class Tile : MonoBehaviour
 
     private void Start()
     {
-        originalType = tileType;
+        if(tileType != TileType.RUINED_MACHINE)
+            originalType = tileType;
         transform.GetChild(2).gameObject.SetActive(tileType == TileType.RUINED_MACHINE);
     }
 

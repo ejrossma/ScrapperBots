@@ -85,11 +85,12 @@ public class SystemManager : MonoBehaviour
                     // Click on selected Tile
                     if (hit.transform.GetComponentInParent<Tile>().selected)
                     {
-                        //if moving
                         if (activeUnit.moveRangeShowing)
                             activeUnit.BasicMove(hit.transform.GetComponentInParent<Tile>());
                         else if (activeUnit.attackRangeShowing)
                             activeUnit.BasicAttack(hit.transform.GetComponentInParent<Tile>().position);
+                        else if (activeUnit.harvestRangeShowing)
+                            activeUnit.Harvest(hit.transform.GetComponentInParent<Tile>().position);
                         else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.BIG_PAL)
                             activeUnit.GetComponent<BigPal>().Intercept(activeUnit.CalculateDirection(hit.transform.GetComponentInParent<Tile>().transform));
 
@@ -237,6 +238,11 @@ public class SystemManager : MonoBehaviour
             attackButton.GetComponent<Button>().onClick.RemoveAllListeners();
             attackButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleAttackRange());
 
+            //harvest button
+            harvestButton.GetComponent<Button>().interactable = !unit.actionUsed && unit.GetValidHarvestPositions().Count > 0;
+            harvestButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            harvestButton.GetComponent<Button>().onClick.AddListener(() => unit.ToggleHarvestRange());
+
             //hold action button
             maintainActionButton.GetComponent<Button>().interactable = true;
             maintainActionButton.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -266,6 +272,7 @@ public class SystemManager : MonoBehaviour
         {
             moveButton.GetComponent<Button>().interactable = false;
             attackButton.GetComponent<Button>().interactable = false;
+            harvestButton.GetComponent<Button>().interactable = false;
             maintainActionButton.GetComponent<Button>().interactable = false;
             overloadButton.GetComponent<Button>().interactable = false;
 

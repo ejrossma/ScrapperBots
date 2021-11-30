@@ -31,6 +31,7 @@ public class UnitController : MonoBehaviour
     public bool abilityTwoRangeShowing;
     public bool meltdownRangeShowing;
     public bool attackRangeShowing;
+    public bool harvestRangeShowing;
     public Sprite icon;
     public bool isDead;
 
@@ -68,6 +69,7 @@ public class UnitController : MonoBehaviour
         abilityOneRangeShowing = false;
         abilityTwoRangeShowing = false;
         meltdownRangeShowing = false;
+        harvestRangeShowing = false;
         if (isDead)
         {
             StartCoroutine(WaitToEndTurn());
@@ -109,6 +111,7 @@ public class UnitController : MonoBehaviour
             abilityOneRangeShowing = false;
             abilityTwoRangeShowing = false;
             meltdownRangeShowing = false;
+            harvestRangeShowing = false;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidMovePositions());
             bm.ChangeIndicator(Color.blue);
@@ -128,6 +131,7 @@ public class UnitController : MonoBehaviour
             abilityOneRangeShowing = false;
             abilityTwoRangeShowing = false;
             meltdownRangeShowing = false;
+            harvestRangeShowing = false;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidAttackPositions());
             bm.ChangeIndicator(Color.red);
@@ -782,5 +786,60 @@ public class UnitController : MonoBehaviour
     private int GetH(Vector3Int t1, Vector3Int t2)
     {
         return Mathf.Max(Mathf.Abs(t1.x - t2.x), Mathf.Abs(t1.y - t2.y), Mathf.Abs(t1.z - t2.z));
+    }
+
+    public List<Transform> GetValidHarvestPositions()
+    {
+        List<Transform> visited = new List<Transform>();
+        Transform above = bm.GetAdjacentTile(position, Direction.ABOVE);
+        if (above != null && above.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(above);
+        Transform upperRight = bm.GetAdjacentTile(position, Direction.UPPER_RIGHT);
+        if (upperRight != null && upperRight.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(upperRight);
+        Transform lowerRight = bm.GetAdjacentTile(position, Direction.LOWER_RIGHT);
+        if (lowerRight != null && lowerRight.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(lowerRight);
+        Transform below = bm.GetAdjacentTile(position, Direction.BELOW);
+        if (below != null && below.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(below);
+        Transform lowerLeft = bm.GetAdjacentTile(position, Direction.LOWER_LEFT);
+        if (lowerLeft != null && lowerLeft.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(lowerLeft);
+        Transform upperLeft = bm.GetAdjacentTile(position, Direction.UPPER_LEFT);
+        if (upperLeft != null && upperLeft.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(upperLeft);
+        return visited;
+    }
+
+    public void ToggleHarvestRange()
+    {
+        if (harvestRangeShowing)
+        {
+            bm.DeselectTiles();
+        }
+        else
+        {
+            moveRangeShowing = false;
+            attackRangeShowing = false;
+            abilityOneRangeShowing = false;
+            abilityTwoRangeShowing = false;
+            meltdownRangeShowing = false;
+            bm.DeselectTiles();
+            bm.SelectTiles(GetValidHarvestPositions());
+            bm.ChangeIndicator(Color.blue);
+        }
+        harvestRangeShowing = !harvestRangeShowing;
+    }
+
+    public void Harvest(Vector2Int pos)
+    {
+        Tile t = bm.GetTile(pos).GetComponent<Tile>();
+        t.RevertTile();
+        RecoverArmor(this, MAXAMR - AMR);
+        RecoverCharge(this, MAXCRG - CRG);
+        actionUsed = true;
+        ToggleHarvestRange();
+        sm.SelectUnit(this);
     }
 }
