@@ -300,9 +300,12 @@ MonoBehaviour:
   unitClass: 3
   LVL: 0
   HP: 50
+  MAXHP: 50
   ATK: 10
   AMR: 20
+  MAXAMR: 20
   CRG: 100
+  MAXCRG: 0
   SPD: 5
   TRD: 3
   ATKRNG: 3
@@ -314,8 +317,12 @@ MonoBehaviour:
   actionUsed: 0
   heldAction: 0
   moveRangeShowing: 0
+  abilityOneRangeShowing: 0
+  abilityTwoRangeShowing: 0
   attackRangeShowing: 0
   icon: {fileID: 21300000, guid: 5722346b4f35a4d0db449517ffdb10ef, type: 3}
+  travelTime: 0
+  waitTime: 0
 --- !u!114 &-730245620666405133
 MonoBehaviour:
   m_ObjectHideFlags: 0

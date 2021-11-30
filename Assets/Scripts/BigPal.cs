@@ -77,6 +77,27 @@ public class BigPal : MonoBehaviour
                 }
             }
         }
+        tiles.Reverse();
+        foreach (Transform t in tiles)
+        {
+            Vector3 start = transform.position;
+            //calculate rotation
+            transform.rotation = uc.CalculateRotation(t);
+            while (uc.travelTime < uc.waitTime)  //condition for interpolation
+            {
+                transform.position = Vector3.Lerp(start, t.transform.position, uc.travelTime / uc.waitTime);
+                uc.travelTime += Time.deltaTime;
+                Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(transform.position.x, 10, transform.position.z - 4.5f));
+                yield return null;
+            }
+            uc.travelTime = 0.0f;
+            uc.position = t.GetComponent<Tile>().position;
+
+            if (!uc.TileOccupiedByTarget(t))
+            {
+                break;
+            }
+        }
         //End for testing purposes
         //if friendly set y to 0 
         //else set to 180

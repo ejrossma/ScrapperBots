@@ -216,7 +216,7 @@ public class SystemManager : MonoBehaviour
             maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
 
             //ability button
-            skillsButton.GetComponent<Button>().interactable = !unit.actionUsed;
+            skillsButton.GetComponent<Button>().interactable = true;
             skillsButton.GetComponent<Button>().onClick.RemoveAllListeners();
             //need to make a show abilities function and add the UI into game
             skillsButton.GetComponent<Button>().onClick.AddListener(() => ToggleAbilities(unit));
@@ -258,7 +258,7 @@ public class SystemManager : MonoBehaviour
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleTeardownRange()); //ability call here
                 // Set false if not enough charge
                 //NEED TO GRAY OUT IF THEY CAN'T ATTACK ANYONE
-                if (ability1Button.GetComponent<Button>().interactable && unit.CRG < 40)
+                if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 40 || unit.GetValidAttackPositions().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!"; //ability name needed

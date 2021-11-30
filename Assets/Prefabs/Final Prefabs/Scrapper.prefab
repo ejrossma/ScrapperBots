@@ -50,10 +50,10 @@ MonoBehaviour:
   unitClass: 1
   LVL: 0
   HP: 20
-  MAXHP: 0
+  MAXHP: 20
   ATK: 25
   AMR: 50
-  MAXAMR: 0
+  MAXAMR: 50
   CRG: 50
   MAXCRG: 0
   SPD: 5
