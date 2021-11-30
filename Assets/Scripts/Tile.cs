@@ -13,4 +13,24 @@ public class Tile : MonoBehaviour
     public int g;
     public int h;
     public Tile parent;
+    private TileType originalType;
+
+    private void Start()
+    {
+        if(tileType != TileType.RUINED_MACHINE)
+            originalType = tileType;
+        transform.GetChild(2).gameObject.SetActive(tileType == TileType.RUINED_MACHINE);
+    }
+
+    public void ChangeTile(TileType t)
+    {
+        tileType = t;
+        transform.GetChild(2).gameObject.SetActive(tileType == TileType.RUINED_MACHINE);
+    }
+
+    public void RevertTile()
+    {
+        tileType = originalType;
+        transform.GetChild(2).gameObject.SetActive(tileType == TileType.RUINED_MACHINE);
+    }
 }

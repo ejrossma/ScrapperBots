@@ -29,8 +29,11 @@ public class UnitController : MonoBehaviour
     public bool moveRangeShowing;
     public bool abilityOneRangeShowing;
     public bool abilityTwoRangeShowing;
+    public bool meltdownRangeShowing;
     public bool attackRangeShowing;
+    public bool harvestRangeShowing;
     public Sprite icon;
+    public bool isDead;
 
     //time elasped for Lerp
     public float travelTime;
@@ -63,6 +66,15 @@ public class UnitController : MonoBehaviour
         isTurn = true;
         moveRangeShowing = false;
         attackRangeShowing = false;
+        abilityOneRangeShowing = false;
+        abilityTwoRangeShowing = false;
+        meltdownRangeShowing = false;
+        harvestRangeShowing = false;
+        if (isDead)
+        {
+            StartCoroutine(WaitToEndTurn());
+            return;
+        }   
         if (CompareTag("Enemy Unit"))
         {
             // Pass turn for now
@@ -96,6 +108,10 @@ public class UnitController : MonoBehaviour
         else
         {
             attackRangeShowing = false;
+            abilityOneRangeShowing = false;
+            abilityTwoRangeShowing = false;
+            meltdownRangeShowing = false;
+            harvestRangeShowing = false;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidMovePositions());
             bm.ChangeIndicator(Color.blue);
@@ -112,6 +128,10 @@ public class UnitController : MonoBehaviour
         else
         {
             moveRangeShowing = false;
+            abilityOneRangeShowing = false;
+            abilityTwoRangeShowing = false;
+            meltdownRangeShowing = false;
+            harvestRangeShowing = false;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidAttackPositions());
             bm.ChangeIndicator(Color.red);
@@ -158,12 +178,75 @@ public class UnitController : MonoBehaviour
 
     }
 
+    public void Meltdown()
+    {
+        EndTurn();
+        Die(this);
+    }
+
+    public void Die(UnitController unit)
+    {
+        Debug.Log(unit.unitName + " has died!");
+        unit.HP = 0;
+        unit.isDead = true;
+        bm.GetTile(unit.position).GetComponent<Tile>().ChangeTile(TileType.RUINED_MACHINE);
+        sm.activeUnits.Remove(unit.gameObject);
+        if(unit.CompareTag("Friendly Unit"))
+            sm.friendlyUnits.Remove(unit.gameObject);
+        else
+            sm.enemyUnits.Remove(unit.gameObject);
+        sm.deadUnits.Add(unit.gameObject);
+        if(sm.unitTurnOrder.Contains(unit.gameObject))
+        {
+            sm.unitTurnOrder.Remove(unit.gameObject);
+            sm.UpdateTurnOrderDisplay();
+        }
+        unit.transform.GetChild(0).gameObject.SetActive(false);
+    }
+
     public void LoseHealth(UnitController unit, int damage) 
     {
         Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
         unit.HP -= damage;
         if (unit.HP < 0)
+        {
             unit.HP = 0;
+            Die(unit);
+        }
+    }
+
+    public void RecoveHealth(UnitController unit, int amount)
+    {
+        Debug.Log(unit.unitName + " recovered " + amount + " health!");
+        unit.HP += amount;
+        if (unit.HP > unit.MAXHP)
+            unit.HP = unit.MAXHP;
+    }
+
+    public void BuffAttack(UnitController unit, int amount)
+    {
+        Debug.Log(unit.unitName + " gained " + amount + " attack!");
+        unit.ATK += amount;
+    }
+
+    public void TakeDamage(UnitController unit, int damage)
+    {
+        if(unit.AMR > 0)
+            Debug.Log(unit.unitName + " lost " + damage + " armor!");
+        unit.AMR -= damage;
+        if (unit.AMR < 0)
+        {
+            LoseHealth(unit, -unit.AMR);
+            unit.AMR = 0;
+        }
+    }
+
+    public void RecoverArmor(UnitController unit, int amount)
+    {
+        Debug.Log(unit.unitName + " recovered " + amount + " armor!");
+        unit.AMR += amount;
+        if (unit.AMR > unit.MAXAMR)
+            unit.AMR = unit.MAXAMR;
     }
 
     public void RecoverCharge(UnitController unit, int amount)
@@ -171,7 +254,7 @@ public class UnitController : MonoBehaviour
         Debug.Log(unit.unitName + " recovered " + amount + " charge!");
         unit.CRG += amount;
         if (unit.CRG > unit.MAXCRG)
-            unit.CRG = MAXCRG;
+            unit.CRG = unit.MAXCRG;
     }
 
     public void SpendCharge(UnitController unit, int amount)
@@ -574,6 +657,46 @@ public class UnitController : MonoBehaviour
         CheckForAttack(visited, new Vector3Int(temp2.x, temp2.y, node.z+1), dir);
     }
 
+    public List<Transform> GetValidAdjacentUnits()
+    {
+        // Vector3Int fields: X is column, Y is row, Z is length of path
+        List<Vector3Int> visited = new List<Vector3Int>();
+
+        CheckForAdjacent(visited, (Vector3Int)position, Direction.ABOVE);
+        CheckForAdjacent(visited, (Vector3Int)position, Direction.BELOW);
+        CheckForAdjacent(visited, (Vector3Int)position, Direction.UPPER_LEFT);
+        CheckForAdjacent(visited, (Vector3Int)position, Direction.LOWER_LEFT);
+        CheckForAdjacent(visited, (Vector3Int)position, Direction.UPPER_RIGHT);
+        CheckForAdjacent(visited, (Vector3Int)position, Direction.LOWER_RIGHT);
+
+        List<Transform> tiles = new List<Transform>();
+
+        foreach (Vector3Int v in visited)
+        {
+            if ((Vector2Int)v != position)
+                tiles.Add(bm.GetTile((Vector2Int)v));
+        }
+
+        return tiles;
+    }
+
+    private void CheckForAdjacent(List<Vector3Int> visited, Vector3Int node, Direction dir)
+    {
+        if (node.z == ATKRNG + 1)
+            return;
+
+        if (TileOccupied(bm.GetTile((Vector2Int)node)))
+        {
+            visited.Add(node);
+            return;
+        }
+        Transform temp = bm.GetAdjacentTile((Vector2Int)node, dir);
+        if (temp == null || !bm.TileIsMovable(temp))
+            return;
+        Vector2Int temp2 = temp.GetComponent<Tile>().position;
+        CheckForAttack(visited, new Vector3Int(temp2.x, temp2.y, node.z + 1), dir);
+    }
+
     // Algorithm derived from Michal Magdziarz's website https://blog.theknightsofunity.com/pathfinding-on-a-hexagonal-grid-a-algorithm/
     public List<Transform> PathfindToTile(Vector2Int pos)
     {
@@ -663,5 +786,60 @@ public class UnitController : MonoBehaviour
     private int GetH(Vector3Int t1, Vector3Int t2)
     {
         return Mathf.Max(Mathf.Abs(t1.x - t2.x), Mathf.Abs(t1.y - t2.y), Mathf.Abs(t1.z - t2.z));
+    }
+
+    public List<Transform> GetValidHarvestPositions()
+    {
+        List<Transform> visited = new List<Transform>();
+        Transform above = bm.GetAdjacentTile(position, Direction.ABOVE);
+        if (above != null && above.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(above);
+        Transform upperRight = bm.GetAdjacentTile(position, Direction.UPPER_RIGHT);
+        if (upperRight != null && upperRight.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(upperRight);
+        Transform lowerRight = bm.GetAdjacentTile(position, Direction.LOWER_RIGHT);
+        if (lowerRight != null && lowerRight.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(lowerRight);
+        Transform below = bm.GetAdjacentTile(position, Direction.BELOW);
+        if (below != null && below.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(below);
+        Transform lowerLeft = bm.GetAdjacentTile(position, Direction.LOWER_LEFT);
+        if (lowerLeft != null && lowerLeft.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(lowerLeft);
+        Transform upperLeft = bm.GetAdjacentTile(position, Direction.UPPER_LEFT);
+        if (upperLeft != null && upperLeft.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            visited.Add(upperLeft);
+        return visited;
+    }
+
+    public void ToggleHarvestRange()
+    {
+        if (harvestRangeShowing)
+        {
+            bm.DeselectTiles();
+        }
+        else
+        {
+            moveRangeShowing = false;
+            attackRangeShowing = false;
+            abilityOneRangeShowing = false;
+            abilityTwoRangeShowing = false;
+            meltdownRangeShowing = false;
+            bm.DeselectTiles();
+            bm.SelectTiles(GetValidHarvestPositions());
+            bm.ChangeIndicator(Color.blue);
+        }
+        harvestRangeShowing = !harvestRangeShowing;
+    }
+
+    public void Harvest(Vector2Int pos)
+    {
+        Tile t = bm.GetTile(pos).GetComponent<Tile>();
+        t.RevertTile();
+        RecoverArmor(this, MAXAMR - AMR);
+        RecoverCharge(this, MAXCRG - CRG);
+        actionUsed = true;
+        ToggleHarvestRange();
+        sm.SelectUnit(this);
     }
 }
