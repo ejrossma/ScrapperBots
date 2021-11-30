@@ -41,6 +41,7 @@ public class SystemManager : MonoBehaviour
     public GameObject ability1Button;
     public GameObject ability2Button;
     public GameObject closeSkillsPanelButton;
+    public GameObject hereCatchPopup;
 
     private int turnCount;
     private BoardManager bm;
@@ -54,6 +55,7 @@ public class SystemManager : MonoBehaviour
         foreach (GameObject g in units)
             enemyUnits.Add(g);
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
+        hereCatchPopup.SetActive(false);
         GetActiveUnits();
     }
 
@@ -75,7 +77,7 @@ public class SystemManager : MonoBehaviour
                 if (unitTurnOrder[0].CompareTag("Friendly Unit"))
                 {
                     SelectUnit(activeUnit);
-                } 
+                }
                 else
                 {
                     return;
@@ -93,12 +95,14 @@ public class SystemManager : MonoBehaviour
                             activeUnit.Harvest(hit.transform.GetComponentInParent<Tile>().position);
                         else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.BIG_PAL)
                             activeUnit.GetComponent<BigPal>().Intercept(activeUnit.CalculateDirection(hit.transform.GetComponentInParent<Tile>().transform));
+                        else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER && activeUnit.GetComponent<Scrapper>().hereCatchPhase == 1)
+                            activeUnit.GetComponent<Scrapper>().HereCatchPhase1(hit.transform.GetComponentInParent<Tile>().position);
 
                     }
                     // Click on unselected Tile
                     else
                     {
-                        
+
                     }
                 }
                 //if clicked on unit
@@ -118,6 +122,10 @@ public class SystemManager : MonoBehaviour
                     {
                         activeUnit.GetComponent<Scrapper>().Teardown(hit.transform.GetComponentInParent<UnitController>());
                     }
+                    else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER && activeUnit.GetComponent<Scrapper>().hereCatchPhase == 2)
+                    {
+                        activeUnit.GetComponent<Scrapper>().HereCatchPhase2(hit.transform.GetComponentInParent<UnitController>().position);
+                    }
                     else if (!activeUnit.inActionorMovement())
                     {
                         // Click on unit
@@ -126,7 +134,7 @@ public class SystemManager : MonoBehaviour
                 }
 
             }
-            else if(!EventSystem.current.IsPointerOverGameObject())
+            else if (!EventSystem.current.IsPointerOverGameObject())
             {
                 if (unitTurnOrder[0].CompareTag("Friendly Unit"))
                 {
@@ -150,7 +158,8 @@ public class SystemManager : MonoBehaviour
 
     private void SetTurnOrderRound()
     {
-        foreach (GameObject g in activeUnits) {
+        foreach (GameObject g in activeUnits)
+        {
             g.GetComponent<UnitController>().heldAction = false;
             g.GetComponent<UnitController>().alreadyMoved = false;
             g.GetComponent<UnitController>().actionUsed = false;
@@ -188,7 +197,7 @@ public class SystemManager : MonoBehaviour
     {
         for (int i = 0; i < turnSlots.Length; i++)
         {
-            if(unitTurnOrder.Count > i)
+            if (unitTurnOrder.Count > i)
             {
                 turnSlots[i].GetComponent<Image>().sprite = unitTurnOrder[i].GetComponent<UnitController>().icon;
                 turnSlots[i].transform.GetChild(0).GetComponent<Text>().text = unitTurnOrder[i].GetComponent<UnitController>().unitName;
@@ -206,7 +215,7 @@ public class SystemManager : MonoBehaviour
         if (unit.isDead)
             return;
 
-        foreach(GameObject g in friendlyUnits)
+        foreach (GameObject g in friendlyUnits)
         {
             g.GetComponentInChildren<SkinnedMeshRenderer>().material = friendlyUnit;
         }
@@ -246,10 +255,13 @@ public class SystemManager : MonoBehaviour
             //hold action button
             maintainActionButton.GetComponent<Button>().interactable = true;
             maintainActionButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            if (!unit.heldAction && (!unit.actionUsed || !unit.alreadyMoved)) {
+            if (!unit.heldAction && (!unit.actionUsed || !unit.alreadyMoved))
+            {
                 maintainActionButton.GetComponent<Button>().onClick.AddListener(() => UnitHoldAction(unit.gameObject));
                 maintainActionButton.GetComponentInChildren<Text>().text = "Hold Action (Can only be used once)";
-            } else {
+            }
+            else
+            {
                 maintainActionButton.GetComponentInChildren<Text>().text = "End Turn";
             }
             maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
@@ -262,8 +274,17 @@ public class SystemManager : MonoBehaviour
 
             // FROM OTHER FUNCTION
             closeSkillsPanelButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => { skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf); bm.DeselectTiles(); });
-            
+            closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => {
+                unit.moveRangeShowing = false;
+                unit.attackRangeShowing = false;
+                unit.abilityOneRangeShowing = false;
+                unit.meltdownRangeShowing = false;
+                unit.harvestRangeShowing = false;
+                skillsPanel.SetActive(!skillsPanel.activeSelf);
+                secondPanel.SetActive(!secondPanel.activeSelf);
+                bm.DeselectTiles();
+            });
+
             ability1Button.GetComponent<Button>().interactable = !unit.actionUsed;
             ability2Button.GetComponent<Button>().interactable = !unit.actionUsed;
             overloadButton.GetComponent<Button>().interactable = !unit.actionUsed;
@@ -303,25 +324,28 @@ public class SystemManager : MonoBehaviour
                 break;
 
             case UnitClass.SCRAPPER:
-                ability1Button.GetComponentInChildren<Text>().text = "Teardown";
+                ability1Button.GetComponentInChildren<Text>().text = "Teardown"; //ability name needed
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleTeardownRange()); //ability call here
-                // Set false if not enough charge
-                //NEED TO GRAY OUT IF THEY CAN'T ATTACK ANYONE
+                // Set false if not enough resource to use
                 if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 40 || unit.GetValidAttackPositions().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!";
+                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleHereCatchRange()); //ability call here
+                // Set false if not enough resource to use
+                if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetValidHarvestPositions().Count == 0 || unit.GetComponent<Scrapper>().GetValidHereCatchPositions().Count == 0))
+                    ability2Button.GetComponent<Button>().interactable = false;
+
+                ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!"; //ability name needed
                 //ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
                 break;
+                // case UnitClass.WITCH:
+                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
 
-            case UnitClass.WITCH:
-                ability1Button.GetComponentInChildren<Text>().text = "Mesmerize";
-                ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleMesmerizeRange()); //ability call here
-
-                ability2Button.GetComponentInChildren<Text>().text = "Corpsecall";
-                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleCorpsecallRange()); //ability call here
-                break;
-
+                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                //     break;
                 // case UnitClass.ELECTROMANCER:
                 //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
                 //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
@@ -333,8 +357,10 @@ public class SystemManager : MonoBehaviour
     }
 
     //return the unit at a position
-    public UnitController GetUnit(Vector2Int pos) {
-        foreach (GameObject unit in activeUnits) {
+    public UnitController GetUnit(Vector2Int pos)
+    {
+        foreach (GameObject unit in activeUnits)
+        {
             if (unit.GetComponent<UnitController>().position == pos)
                 return unit.GetComponent<UnitController>();
         }
@@ -360,7 +386,7 @@ public class SystemManager : MonoBehaviour
         displayDebuffs.text = "Debuffs:";
     }
 
-    public void UpdateStats(UnitController unit) 
+    public void UpdateStats(UnitController unit)
     {
         displayName.text = unit.unitName;
         displayHealth.text = "Health: " + unit.HP;
@@ -370,10 +396,10 @@ public class SystemManager : MonoBehaviour
         displayThreads.text = "Threads: " + unit.TRD;
         displayAttack.text = "Attack: " + unit.ATK;
         displayBuffs.text = "Buffs:";
-        displayDebuffs.text = "Debuffs:";        
+        displayDebuffs.text = "Debuffs:";
     }
 
-    public void ToggleAbilities(UnitController unit) 
+    public void ToggleAbilities(UnitController unit)
     {
         skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf);
     }
