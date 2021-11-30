@@ -216,12 +216,59 @@ public class SystemManager : MonoBehaviour
             skillsButton.GetComponent<Button>().onClick.RemoveAllListeners();
             //need to make a show abilities function and add the UI into game
             skillsButton.GetComponent<Button>().onClick.AddListener(() => ToggleAbilities(unit));
+
+            // FROM OTHER FUNCTION
+            closeSkillsPanelButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => { skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf); bm.DeselectTiles(); });
+            
+            ability1Button.GetComponent<Button>().interactable = !unit.actionUsed;
+            ability2Button.GetComponent<Button>().interactable = !unit.actionUsed;  
         }
         else
         {
             moveButton.GetComponent<Button>().interactable = false;
             attackButton.GetComponent<Button>().interactable = false;
             maintainActionButton.GetComponent<Button>().interactable = false;
+
+            ability1Button.GetComponent<Button>().interactable = false;
+            ability2Button.GetComponent<Button>().interactable = false;
+        }
+
+        ability1Button.GetComponent<Button>().onClick.RemoveAllListeners();
+        ability2Button.GetComponent<Button>().onClick.RemoveAllListeners();
+        switch (unit.unitClass)
+        {
+            case UnitClass.BIG_PAL:
+                ability1Button.GetComponentInChildren<Text>().text = "Intercept";
+                ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleInterceptRange()); //ability call here
+                // Set false if not enough resource to use
+                if (ability1Button.GetComponent<Button>().interactable && unit.CRG < 15)
+                    ability1Button.GetComponent<Button>().interactable = false;
+
+                ability2Button.GetComponentInChildren<Text>().text = "The Best Defense";
+                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().GetValidBestDefenseRange()); //ability call here
+                break;
+                // case UnitClass.SCRAPPER:
+                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+
+                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                //     break;
+                // case UnitClass.WITCH:
+                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+
+                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                //     break;
+                // case UnitClass.ELECTROMANCER:
+                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+
+                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
+                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
+                //     break;                                                
         }
     }
 
@@ -269,45 +316,7 @@ public class SystemManager : MonoBehaviour
     public void ToggleAbilities(UnitController unit) 
     {
         skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf);
-        closeSkillsPanelButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => { skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf); bm.DeselectTiles(); });
-        //if active then change names of abilities to match the player unit
-        if (skillsPanel.activeSelf)
-        {
-            ability1Button.GetComponent<Button>().onClick.RemoveAllListeners();
-            ability2Button.GetComponent<Button>().onClick.RemoveAllListeners();
-            switch (unit.unitClass)
-            {
-                case UnitClass.BIG_PAL:
-                    ability1Button.GetComponentInChildren<Text>().text = "Intercept";
-                    ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleInterceptRange()); //ability call here
-
-                    ability2Button.GetComponentInChildren<Text>().text = "The Best Defense";
-                    ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().GetValidBestDefenseRange()); //ability call here
-                    break;
-                // case UnitClass.SCRAPPER:
-                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-
-                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-                //     break;
-                // case UnitClass.WITCH:
-                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-
-                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-                //     break;
-                // case UnitClass.ELECTROMANCER:
-                //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-
-                //     ability2Button.GetComponentInChildren<Text>().text = ; //ability name needed
-                //     ability2Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
-                //     break;                                                
-            }
-        }
+       
 
     }
 }
