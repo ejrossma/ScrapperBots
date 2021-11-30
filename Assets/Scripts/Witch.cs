@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Witch : MonoBehaviour
 {
-
     private BoardManager bm;
     private SystemManager sm;
     private UnitController uc;
@@ -12,7 +11,6 @@ public class Witch : MonoBehaviour
     public bool selectUnitToMesmerize;
     public UnitController mesmerizedUnit;
 
-    // Start is called before the first frame update
     void Start()
     {
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();

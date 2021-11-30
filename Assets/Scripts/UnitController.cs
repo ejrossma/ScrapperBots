@@ -55,8 +55,6 @@ public class UnitController : MonoBehaviour
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
         MoveToTile(position);
-        if (unitClass != UnitClass.WITCH)
-            Die(this);
     }
 
     private void Update()
@@ -82,12 +80,14 @@ public class UnitController : MonoBehaviour
         }   
         if (CompareTag("Enemy Unit"))
         {
-            // Pass turn for now
-            StartCoroutine(WaitToEndTurn());
-        }
-        else
-        {
-            
+            switch(unitClass)
+            {
+                case UnitClass.KNIFE: GetComponent<Knife>().RunAI(); break;
+                //case UnitClass.BOMBERMAN: GetComponent<Bomberman>().RunAI(); break;
+                //case UnitClass.REAVER: GetComponent<Reaver>().RunAI(); break;
+                //case UnitClass.SLUGGER: GetComponent<Slugger>().RunAI(); break;
+                //case UnitClass.TANK: GetComponent<Tank>().RunAI(); break;
+            }
         }
     }
 
@@ -168,19 +168,16 @@ public class UnitController : MonoBehaviour
         transform.rotation = CalculateRotation(bm.GetTile(pos));
         StopCoroutine(ResetRotationAfterAttack());
         StartCoroutine(ResetRotationAfterAttack());
-        LoseHealth(unit, ATK);
+        TakeDamage(unit, ATK);
         actionUsed = true;
         ToggleAttackRange();
         sm.SelectUnit(this);
     }
 
-    IEnumerator ResetRotationAfterAttack() 
+    public IEnumerator ResetRotationAfterAttack() 
     {
-        
         yield return new WaitForSeconds(0.75f);
-
         transform.rotation = Quaternion.Euler(0,0,0);
-
     }
 
     public void Meltdown()
@@ -232,9 +229,9 @@ public class UnitController : MonoBehaviour
         unit.transform.GetChild(0).gameObject.SetActive(true);
     }
 
-    public void LoseHealth(UnitController unit, int damage) 
+    private void LoseHealth(UnitController unit, int damage) 
     {
-        Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
+        Debug.Log(unit.unitName + " lost " + damage + " health!");
         unit.HP -= damage;
         if (unit.HP <= 0)
         {
@@ -259,14 +256,24 @@ public class UnitController : MonoBehaviour
 
     public void TakeDamage(UnitController unit, int damage)
     {
-        if(unit.AMR > 0)
-            Debug.Log(unit.unitName + " lost " + damage + " armor!");
+        Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
         unit.AMR -= damage;
         if (unit.AMR < 0)
         {
+            Debug.Log(unit.unitName + " lost " + (damage + unit.AMR) + " armor!");
             LoseHealth(unit, -unit.AMR);
             unit.AMR = 0;
         }
+        else
+        {
+            Debug.Log(unit.unitName + " lost " + damage + " armor!");
+        }
+    }
+
+    public void TakeDirectDamage(UnitController unit, int damage)
+    {
+        Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
+        LoseHealth(unit, damage);
     }
 
     public void RecoverArmor(UnitController unit, int amount)
@@ -360,8 +367,10 @@ public class UnitController : MonoBehaviour
             rotValue = 60.0f;
         else if ((position.x % 2 != 0 && position.x < t.x && position.y == t.y) || (position.x % 2 == 0 && position.x < t.x && position.y > t.y))  //lower right
             rotValue = 120.0f;
-        
-        return Quaternion.Euler(0, rotValue, 0);
+
+        if(CompareTag("Friendly Unit"))
+            return Quaternion.Euler(0, rotValue, 0);
+        return Quaternion.Euler(0, rotValue - 180, 0);
     }
 
     //calculates direction when given a target tile
@@ -807,7 +816,7 @@ public class UnitController : MonoBehaviour
             return;
         Tile adjacentTile = node.GetComponent<Tile>();
         // Check if tile is valid
-        if (node != null && bm.TileIsMovable(node) && !TileOccupied(node) && !closedPathTiles.Contains(adjacentTile))
+        if (node != null && bm.TileIsMovable(node) && (!TileOccupied(node) || node.GetComponent<Tile>().position == endPoint.position) && !closedPathTiles.Contains(adjacentTile))
         {
             if (!openPathTiles.Contains(adjacentTile))
             {

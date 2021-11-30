@@ -28,7 +28,7 @@ public class Scrapper : MonoBehaviour
         uc.actionUsed = true;
         transform.rotation = uc.CalculateRotation(bm.GetTile(unit.position));
         ToggleTeardownRange();
-        uc.LoseHealth(unit, uc.ATK);
+        uc.TakeDirectDamage(unit, uc.ATK);
         StopCoroutine(ResetRotationAfterAttack());
         StartCoroutine(ResetRotationAfterAttack());
         sm.SelectUnit(unit);
