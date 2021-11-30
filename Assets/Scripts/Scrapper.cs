@@ -176,4 +176,53 @@ public class Scrapper : MonoBehaviour
         ToggleHereCatchRange();
         sm.SelectUnit(uc);
     }
+
+    public void ToggleLastHarvestRange()
+    {
+        if (uc.meltdownRangeShowing)
+        {
+            bm.DeselectTiles();
+        }
+        else
+        {
+            uc.moveRangeShowing = false;
+            uc.attackRangeShowing = false;
+            uc.abilityOneRangeShowing = false;
+            uc.abilityTwoRangeShowing = false;
+            uc.harvestRangeShowing = false;
+            bm.DeselectTiles();
+            bm.SelectTiles(uc.GetValidAttackPositions());
+            bm.ChangeIndicator(Color.red);
+        }
+        uc.meltdownRangeShowing = !uc.meltdownRangeShowing;
+    }
+
+    public void LastHarvest(Vector2Int pos)
+    {
+        UnitController unit = sm.GetUnit(pos);
+        ToggleLastHarvestRange();
+        uc.Die(unit);
+
+        int changedTiles = 0;
+        List<Direction> directions = new List<Direction>() { Direction.ABOVE, Direction.UPPER_RIGHT, Direction.LOWER_RIGHT, Direction.BELOW, Direction.LOWER_LEFT, Direction.LOWER_RIGHT };
+        for (int i = 0; i < 6; i++)
+        {
+            Direction d = GetRandomDirection(directions);
+            Transform tile = bm.GetAdjacentTile(pos, d);
+            directions.Remove(d);
+            if (tile != null && bm.TileIsMovable(tile) && !uc.TileOccupied(tile) && changedTiles < 3)
+            {
+                tile.GetComponent<Tile>().ChangeTile(TileType.RUINED_MACHINE);
+                changedTiles++;
+            }
+        }
+
+        uc.actionUsed = true;
+        uc.Meltdown();
+    }
+
+    private Direction GetRandomDirection(List<Direction> list)
+    {
+        return list[Random.Range(0, list.Count - 1)];
+    }
 }

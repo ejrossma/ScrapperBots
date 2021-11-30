@@ -134,10 +134,14 @@ public class SystemManager : MonoBehaviour
                     {
                         activeUnit.GetComponent<Scrapper>().HereCatchPhase2(hit.transform.GetComponentInParent<UnitController>().position);
                     }
+                    else if (activeUnit.meltdownRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER)
+                    {
+                        activeUnit.GetComponent<Scrapper>().LastHarvest(hit.transform.GetComponentInParent<UnitController>().position);
+                    }
                     else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.WITCH && !activeUnit.GetComponent<Witch>().selectUnitToMesmerize)
                     {
                         activeUnit.GetComponent<Witch>().Mesmerize(hit.transform.GetComponentInParent<UnitController>());
-                    }
+                    }                    
                     else if (!activeUnit.inActionorMovement())
                     {
                         // Click on unit
@@ -347,6 +351,11 @@ public class SystemManager : MonoBehaviour
                 // Set false if not enough resource to use
                 if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetValidHarvestPositions().Count == 0 || unit.GetComponent<Scrapper>().GetValidHereCatchPositions().Count == 0))
                     ability2Button.GetComponent<Button>().interactable = false;
+
+                overloadButton.GetComponentInChildren<Text>().text = "Last Harvest (Meltdown)";
+                overloadButton.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleLastHarvestRange()); //ability call here
+                if (overloadButton.GetComponent<Button>().interactable && unit.GetValidAttackPositions().Count == 0)
+                    overloadButton.GetComponent<Button>().interactable = false;
                 break;
 
             case UnitClass.WITCH:
