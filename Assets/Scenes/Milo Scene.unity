@@ -2149,15 +2149,19 @@ PrefabInstance:
     - target: {fileID: 3667711254300637859, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 394d20dcd026d4e65a5f734d8ec14a4c, type: 2}
+      objectReference: {fileID: 2100000, guid: c08628546ab064534817bcb6fc2f175b, type: 2}
     - target: {fileID: 3667711255019080166, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 394d20dcd026d4e65a5f734d8ec14a4c, type: 2}
+      objectReference: {fileID: 2100000, guid: c08628546ab064534817bcb6fc2f175b, type: 2}
     - target: {fileID: 3667711255220113087, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 394d20dcd026d4e65a5f734d8ec14a4c, type: 2}
+      objectReference: {fileID: 2100000, guid: c08628546ab064534817bcb6fc2f175b, type: 2}
+    - target: {fileID: 3941484571121987113, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4576160963896705407, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Name
       value: Tile Row (6)
@@ -2756,18 +2760,22 @@ PrefabInstance:
       propertyPath: tileType
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1867112619913010253, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2143139101931846530, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 394d20dcd026d4e65a5f734d8ec14a4c, type: 2}
+      objectReference: {fileID: 2100000, guid: c08628546ab064534817bcb6fc2f175b, type: 2}
     - target: {fileID: 2143139102415014087, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 394d20dcd026d4e65a5f734d8ec14a4c, type: 2}
+      objectReference: {fileID: 2100000, guid: c08628546ab064534817bcb6fc2f175b, type: 2}
     - target: {fileID: 2143139103877643483, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 394d20dcd026d4e65a5f734d8ec14a4c, type: 2}
+      objectReference: {fileID: 2100000, guid: c08628546ab064534817bcb6fc2f175b, type: 2}
     - target: {fileID: 2170147566185646026, guid: 7695bb52f330d446d8f7e56903995238, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -3726,9 +3734,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activeUnits: []
+  deadUnits: []
   unitTurnOrder: []
   friendlyUnits: []
   enemyUnits: []
+  friendlyUnit: {fileID: 2100000, guid: d1f9217b1f0034a9ab0e222f2b585bda, type: 2}
+  enemyUnit: {fileID: 2100000, guid: 8dec69b8b9ea1499d96b3e1307e8d54f, type: 2}
+  friendlySelected: {fileID: 2100000, guid: 46167eb9001534b7fbf1db61ad4e58bc, type: 2}
+  enemySelected: {fileID: 2100000, guid: 59511de88bde4493d905a5a9652c02ed, type: 2}
   turnSlots:
   - {fileID: 759288539}
   - {fileID: 1845636247}
@@ -7873,7 +7886,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1375268213732991633, guid: 573a529d26f174c9f8d1241b787c1737, type: 3}
       propertyPath: HP
-      value: 250
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1375268213732991633, guid: 573a529d26f174c9f8d1241b787c1737, type: 3}
       propertyPath: TRD

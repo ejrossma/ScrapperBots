@@ -8,9 +8,14 @@ public class SystemManager : MonoBehaviour
 {
     [Header("-Units-")]
     public List<GameObject> activeUnits = new List<GameObject>();
+    public List<GameObject> deadUnits = new List<GameObject>();
     public List<GameObject> unitTurnOrder = new List<GameObject>();
-    public GameObject[] friendlyUnits;
-    public GameObject[] enemyUnits;
+    public List<GameObject> friendlyUnits;
+    public List<GameObject> enemyUnits;
+    public Material friendlyUnit;
+    public Material enemyUnit;
+    public Material friendlySelected;
+    public Material enemySelected;
 
     [Header("-UI-")]
     public GameObject[] turnSlots;
@@ -42,8 +47,12 @@ public class SystemManager : MonoBehaviour
 
     private void Awake()
     {
-        friendlyUnits = GameObject.FindGameObjectsWithTag("Friendly Unit");
-        enemyUnits = GameObject.FindGameObjectsWithTag("Enemy Unit");
+        GameObject[] units = GameObject.FindGameObjectsWithTag("Friendly Unit");
+        foreach (GameObject g in units)
+            friendlyUnits.Add(g);
+        units = GameObject.FindGameObjectsWithTag("Enemy Unit");
+        foreach (GameObject g in units)
+            enemyUnits.Add(g);
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         GetActiveUnits();
     }
@@ -99,6 +108,10 @@ public class SystemManager : MonoBehaviour
                         // Click on unit with attack range showing
                         if (bm.GetTile(hit.transform.GetComponentInParent<UnitController>().position).GetComponent<Tile>().selected)
                             activeUnit.BasicAttack(hit.transform.GetComponentInParent<UnitController>().position);
+                    }
+                    else if (activeUnit.meltdownRangeShowing && activeUnit.unitClass == UnitClass.BIG_PAL)
+                    {
+                        activeUnit.GetComponent<BigPal>().Sacrifice(hit.transform.GetComponentInParent<UnitController>());
                     }
                     else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER)
                     {
@@ -189,6 +202,26 @@ public class SystemManager : MonoBehaviour
 
     public void SelectUnit(UnitController unit)
     {
+        if (unit.isDead)
+            return;
+
+        foreach(GameObject g in friendlyUnits)
+        {
+            g.GetComponentInChildren<SkinnedMeshRenderer>().material = friendlyUnit;
+        }
+        foreach (GameObject g in enemyUnits)
+        {
+            g.GetComponentInChildren<SkinnedMeshRenderer>().material = enemyUnit;
+        }
+        if (unit.CompareTag("Friendly Unit"))
+        {
+            unit.GetComponentInChildren<SkinnedMeshRenderer>().material = friendlySelected;
+        }
+        else
+        {
+            unit.GetComponentInChildren<SkinnedMeshRenderer>().material = enemySelected;
+        }
+
         UpdateStats(unit);
         Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(unit.gameObject.transform.position.x, 10, unit.gameObject.transform.position.z - 4.5f));
         // Activate turn UI on unit's turn, otherwise deactivate turn UI
@@ -226,13 +259,15 @@ public class SystemManager : MonoBehaviour
             closeSkillsPanelButton.GetComponent<Button>().onClick.AddListener(() => { skillsPanel.SetActive(!skillsPanel.activeSelf); secondPanel.SetActive(!secondPanel.activeSelf); bm.DeselectTiles(); });
             
             ability1Button.GetComponent<Button>().interactable = !unit.actionUsed;
-            ability2Button.GetComponent<Button>().interactable = !unit.actionUsed;  
+            ability2Button.GetComponent<Button>().interactable = !unit.actionUsed;
+            overloadButton.GetComponent<Button>().interactable = !unit.actionUsed;
         }
         else
         {
             moveButton.GetComponent<Button>().interactable = false;
             attackButton.GetComponent<Button>().interactable = false;
             maintainActionButton.GetComponent<Button>().interactable = false;
+            overloadButton.GetComponent<Button>().interactable = false;
 
             ability1Button.GetComponent<Button>().interactable = false;
             ability2Button.GetComponent<Button>().interactable = false;
@@ -240,17 +275,24 @@ public class SystemManager : MonoBehaviour
 
         ability1Button.GetComponent<Button>().onClick.RemoveAllListeners();
         ability2Button.GetComponent<Button>().onClick.RemoveAllListeners();
+        overloadButton.GetComponent<Button>().onClick.RemoveAllListeners();
         switch (unit.unitClass)
         {
             case UnitClass.BIG_PAL:
                 ability1Button.GetComponentInChildren<Text>().text = "Intercept";
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleInterceptRange()); //ability call here
                 // Set false if not enough resource to use
-                if (ability1Button.GetComponent<Button>().interactable && unit.CRG < 15)
+                if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 15 || unit.GetComponent<BigPal>().GetValidInterceptionRange().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "The Best Defense";
-                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().GetValidBestDefenseRange()); //ability call here
+                ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().TheBestDefense()); //ability call here
+                // Set false if not enough resource to use
+                if (ability2Button.GetComponent<Button>().interactable && (unit.AMR < 40 || unit.GetValidAdjacentUnits().Count == 0))
+                    ability2Button.GetComponent<Button>().interactable = false;
+
+                overloadButton.GetComponentInChildren<Text>().text = "Sacrifice (Meltdown)";
+                overloadButton.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleSacrificeRange()); //ability call here
                 break;
 
             case UnitClass.SCRAPPER:

@@ -16,12 +16,6 @@ public class BigPal : MonoBehaviour
         uc = GetComponentInParent<UnitController>();        
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     //basic ability
     public void Intercept(Direction dir) 
     {
@@ -73,7 +67,7 @@ public class BigPal : MonoBehaviour
                 if(unit.GetComponent<UnitController>().position == t.GetComponent<Tile>().position)
                 {
                     // Hit enemy
-                    uc.LoseHealth(unit.GetComponent<UnitController>(), 10);
+                    uc.TakeDamage(unit.GetComponent<UnitController>(), 10);
                 }
             }
         }
@@ -117,6 +111,9 @@ public class BigPal : MonoBehaviour
         else
         {
             GetComponent<UnitController>().moveRangeShowing = false;
+            GetComponent<UnitController>().attackRangeShowing = false;
+            GetComponent<UnitController>().abilityTwoRangeShowing = false;
+            GetComponent<UnitController>().meltdownRangeShowing = false;
             bm.DeselectTiles();
             bm.SelectTiles(GetValidInterceptionRange());
             bm.ChangeIndicator(Color.blue);
@@ -126,7 +123,6 @@ public class BigPal : MonoBehaviour
 
     //straight line out in all directions until hit edge of map, wall, or ally
     //called when the player clicks on the intercept ability button
-    //NEEDS TO BE TESTED
     public List<Transform> GetValidInterceptionRange() 
     {
         // Vector3Int fields: X is column, Y is row, Z is length of path
@@ -166,17 +162,77 @@ public class BigPal : MonoBehaviour
     //basic ability
     public void TheBestDefense() 
     {
-
+        uc.TakeDamage(uc, 40);
+        //effect
+        TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.ABOVE));
+        TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.UPPER_RIGHT));
+        TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.LOWER_RIGHT));
+        TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.BELOW));
+        TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.LOWER_LEFT));
+        TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.UPPER_LEFT));
+        uc.actionUsed = true;
+        sm.SelectUnit(uc);
     }
 
-    public void GetValidBestDefenseRange() 
+    private void TheBestDefenseEffect(Transform tile)
     {
-        Debug.Log("Best Defense Used");
+        UnitController unit;
+        if (tile != null)
+        {
+            unit = sm.GetUnit(tile.GetComponent<Tile>().position);
+            if (unit != null)
+            {
+                if (unit.CompareTag("Friendly Unit"))
+                {
+                    uc.RecoverArmor(unit, 10);
+                }
+                else
+                {
+                    uc.TakeDamage(unit, uc.ATK);
+                }
+            }
+        }
     }
 
     //meltdown ability
-    public void Sacrifice() 
+    public void ToggleSacrificeRange()
     {
+        if (GetComponent<UnitController>().meltdownRangeShowing)
+        {
+            bm.DeselectTiles();
+        }
+        else
+        {
+            GetComponent<UnitController>().moveRangeShowing = false;
+            GetComponent<UnitController>().attackRangeShowing = false;
+            GetComponent<UnitController>().abilityOneRangeShowing = false;
+            GetComponent<UnitController>().abilityTwoRangeShowing = false;
+            bm.DeselectTiles();
+            bm.SelectTiles(GetValidSacrificeRange());
+            bm.ChangeIndicator(Color.blue);
+        }
+        GetComponent<UnitController>().meltdownRangeShowing = !GetComponent<UnitController>().meltdownRangeShowing;
+    }
 
+    public List<Transform> GetValidSacrificeRange()
+    {
+        List<Transform> allies = new List<Transform>();
+        foreach (GameObject g in sm.friendlyUnits)
+        {
+            if(g.GetComponent<UnitController>().position != uc.position)
+                allies.Add(bm.GetTile(g.GetComponent<UnitController>().position));
+        }
+        return allies;
+    }
+
+    public void Sacrifice(UnitController target) 
+    {
+        ToggleSacrificeRange();
+        uc.RecoveHealth(target, target.MAXHP - target.HP);
+        uc.RecoverArmor(target, target.MAXAMR - target.AMR);
+        uc.RecoverCharge(target, target.MAXCRG - target.CRG);
+        uc.BuffAttack(target, 20);
+        uc.actionUsed = true;
+        uc.Meltdown();
     }
 }
