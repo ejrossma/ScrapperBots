@@ -83,8 +83,8 @@ public class UnitController : MonoBehaviour
             switch(unitClass)
             {
                 case UnitClass.KNIFE: GetComponent<Knife>().RunAI(); break;
-                //case UnitClass.BOMBERMAN: GetComponent<Bomberman>().RunAI(); break;
-                //case UnitClass.REAVER: GetComponent<Reaver>().RunAI(); break;
+                case UnitClass.BOMBERMAN: GetComponent<Bomberman>().RunAI(); break;
+                case UnitClass.REAVER: GetComponent<Reaver>().RunAI(); break;
                 //case UnitClass.SLUGGER: GetComponent<Slugger>().RunAI(); break;
                 //case UnitClass.TANK: GetComponent<Tank>().RunAI(); break;
             }
