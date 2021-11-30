@@ -1729,7 +1729,6 @@ GameObject:
   - component: {fileID: 353110922}
   - component: {fileID: 353110921}
   - component: {fileID: 353110920}
-  - component: {fileID: 353110919}
   m_Layer: 5
   m_Name: Hold Action
   m_TagString: Untagged
@@ -1757,20 +1756,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &353110919
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 353110917}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f01d91b32a745ff448bb8cd97d3bfde8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ScrapPanel: {fileID: 0}
-  SkillsCol1Panel: {fileID: 1303024394}
 --- !u!114 &353110920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3544,7 +3529,6 @@ GameObject:
   - component: {fileID: 897777299}
   - component: {fileID: 897777298}
   - component: {fileID: 897777297}
-  - component: {fileID: 897777296}
   m_Layer: 5
   m_Name: Abilities
   m_TagString: Untagged
@@ -3572,20 +3556,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &897777296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 897777294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f04c4e3556e8ba4692559d65555622e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SkillsPanel: {fileID: 668049208}
-  SkillsCol2Panel: {fileID: 1783986441}
 --- !u!114 &897777297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5598,7 +5568,6 @@ GameObject:
   - component: {fileID: 1442671314}
   - component: {fileID: 1442671313}
   - component: {fileID: 1442671312}
-  - component: {fileID: 1442671311}
   m_Layer: 5
   m_Name: CloseSkillsPanel
   m_TagString: Untagged
@@ -5626,20 +5595,6 @@ RectTransform:
   m_AnchoredPosition: {x: 320, y: -243.33331}
   m_SizeDelta: {x: 580, y: 73.33333}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1442671311
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442671309}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f04c4e3556e8ba4692559d65555622e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SkillsPanel: {fileID: 668049208}
-  SkillsCol2Panel: {fileID: 1783986441}
 --- !u!114 &1442671312
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -228,7 +228,7 @@ public class UnitController : MonoBehaviour
     {
         Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
         unit.HP -= damage;
-        if (unit.HP < 0)
+        if (unit.HP <= 0)
         {
             unit.HP = 0;
             Die(unit);

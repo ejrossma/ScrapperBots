@@ -97,6 +97,14 @@ public class SystemManager : MonoBehaviour
                             activeUnit.GetComponent<BigPal>().Intercept(activeUnit.CalculateDirection(hit.transform.GetComponentInParent<Tile>().transform));
                         else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER && activeUnit.GetComponent<Scrapper>().hereCatchPhase == 1)
                             activeUnit.GetComponent<Scrapper>().HereCatchPhase1(hit.transform.GetComponentInParent<Tile>().position);
+                        //THIS NEEDS TO BE TESTED
+                            //CURRENTLY BREAKS BECAUSE MESMERIZEDUNIT IS NULL SOMETIMES
+                            //ALSO NEED TO RESET MESMERIZEDUNIT AND SELECTUNITTOMESMERIZE AFTER USING ABILITY OR AFTER CANCELLING OUT
+                        else if (activeUnit.GetComponent<Witch>().mesmerizedUnit != null && activeUnit.unitClass == UnitClass.WITCH && activeUnit.GetComponent<Witch>().selectUnitToMesmerize)
+                            activeUnit.GetComponent<Witch>().MesmerizeMovement(hit.transform.GetComponentInParent<Tile>());
+                        //THIS MIGHT NEED TO BE FIXED BECAUSE IDK IF THE RUINED MACHINE TILES HAVE HITBOXES ON THE MACHINE PART
+                        else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.WITCH)
+                            activeUnit.GetComponent<Witch>().Corpsecall(hit.transform.GetComponentInParent<Tile>());
 
                     }
                     // Click on unselected Tile
@@ -125,6 +133,10 @@ public class SystemManager : MonoBehaviour
                     else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.SCRAPPER && activeUnit.GetComponent<Scrapper>().hereCatchPhase == 2)
                     {
                         activeUnit.GetComponent<Scrapper>().HereCatchPhase2(hit.transform.GetComponentInParent<UnitController>().position);
+                    }
+                    else if (activeUnit.abilityOneRangeShowing && activeUnit.unitClass == UnitClass.WITCH && !activeUnit.GetComponent<Witch>().selectUnitToMesmerize)
+                    {
+                        activeUnit.GetComponent<Witch>().Mesmerize(hit.transform.GetComponentInParent<UnitController>());
                     }
                     else if (!activeUnit.inActionorMovement())
                     {
@@ -340,16 +352,17 @@ public class SystemManager : MonoBehaviour
             case UnitClass.WITCH:
                 ability1Button.GetComponentInChildren<Text>().text = "Mesmerize";
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleMesmerizeRange()); //ability call here
-                // Set false if not enough resource to use
-                // if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 20 || unit.GetValidMesmerizePositions().Count == 0))
-                //     ability1Button.GetComponent<Button>().interactable = false;
+                //Set false if not enough resource to use
+                if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 20 || unit.GetComponent<Witch>().GetValidMesmerizeRange().Count == 0 || unit.actionUsed))
+                    ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "Corpsecall";
                 ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleCorpsecallRange()); //ability call here
                 // Set false if not enough resource to use
-                // if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetValidMesmerizePositions().Count == 0))
-                //     ability2Button.GetComponent<Button>().interactable = false;                
+                if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetComponent<Witch>().GetValidCorpsecallRange().Count == 0 || unit.actionUsed))
+                    ability2Button.GetComponent<Button>().interactable = false;                
                 break;
+
                 // case UnitClass.ELECTROMANCER:
                 //     ability1Button.GetComponentInChildren<Text>().text = ; //ability name needed
                 //     ability1Button.GetComponent<Button>().onClick.AddListener(() => ); //ability call here
