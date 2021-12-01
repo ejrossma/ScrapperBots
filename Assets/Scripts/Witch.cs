@@ -34,6 +34,7 @@ public class Witch : MonoBehaviour
         mesmerizedUnit.isMesmerized = true;
         MesmerizeMoveEffect(tile);
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         uc.SpendCharge(uc, 20);
         ToggleMesmerizeRange();
         sm.SelectUnit(mesmerizedUnit);
@@ -142,6 +143,7 @@ public class Witch : MonoBehaviour
         MarchCorpseCall(tile, tile, direction);
         ToggleCorpsecallRange();
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         sm.SelectUnit(uc);
     }
 
@@ -238,6 +240,7 @@ public class Witch : MonoBehaviour
             uc.Revive(g.GetComponent<UnitController>());
         }
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         uc.Meltdown();
     }
 }

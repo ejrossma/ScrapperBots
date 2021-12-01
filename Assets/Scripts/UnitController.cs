@@ -36,6 +36,11 @@ public class UnitController : MonoBehaviour
     public bool isDead;
     public bool isMesmerized;
 
+    public int destroyed = 0;
+    public int damageDealt = 0;
+    public int damageTaken = 0;
+    public int abilitesUsed = 0;
+
     //time elasped for Lerp
     public float travelTime;
     //goal time for Lerp
@@ -60,11 +65,6 @@ public class UnitController : MonoBehaviour
         waitTime = 0.5f;
         
         MoveToTile(position);
-    }
-
-    private void Update()
-    {
-
     }
 
     public void SetTurn() 
@@ -193,7 +193,15 @@ public class UnitController : MonoBehaviour
 
     public void Die(UnitController unit)
     {
-        Debug.Log(unit.unitName + " has died!");
+        if (unit.position == position)
+        {
+            Debug.Log(unit.unitName + " has died!");
+        }
+        else
+        {
+            Debug.Log(unitName + " has killed " + unit.unitName + "!");
+            destroyed++;
+        }
         unit.HP = 0;
         unit.isDead = true;
         Tile tile = bm.GetTile(unit.position).GetComponent<Tile>();
@@ -211,6 +219,7 @@ public class UnitController : MonoBehaviour
             sm.UpdateTurnOrderDisplay();
         }
         unit.transform.GetChild(0).gameObject.SetActive(false);
+        GameOverCheck();
     }
 
     public void Revive(UnitController unit)
@@ -262,6 +271,8 @@ public class UnitController : MonoBehaviour
     public void TakeDamage(UnitController unit, int damage)
     {
         Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
+        unit.damageTaken += damage;
+        damageDealt += damage;
         unit.AMR -= damage;
         if (unit.AMR < 0)
         {
@@ -278,6 +289,8 @@ public class UnitController : MonoBehaviour
     public void TakeDirectDamage(UnitController unit, int damage)
     {
         Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
+        unit.damageTaken += damage;
+        damageDealt += damage;
         LoseHealth(unit, damage);
     }
 
@@ -931,5 +944,19 @@ public class UnitController : MonoBehaviour
     public bool AreAliveAllies()
     {
         return sm.friendlyUnits.Count > 1;
+    }
+
+    public void GameOverCheck()
+    {
+        if(sm.friendlyUnits.Count == 0)
+        {
+            // Player loses
+            sm.GameOver(false);
+        }
+        else if(sm.enemyUnits.Count == 0)
+        {
+            // Player wins
+            sm.GameOver(true);
+        }
     }
 }

@@ -26,6 +26,7 @@ public class Scrapper : MonoBehaviour
     {
         uc.SpendCharge(uc, 40);
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         transform.rotation = uc.CalculateRotation(bm.GetTile(unit.position));
         ToggleTeardownRange();
         uc.TakeDirectDamage(unit, uc.ATK);
@@ -172,6 +173,7 @@ public class Scrapper : MonoBehaviour
         StartCoroutine(ResetRotationAfterAttack());
 
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         uc.SpendCharge(uc, 10);
         ToggleHereCatchRange();
         sm.SelectUnit(uc);
@@ -218,6 +220,7 @@ public class Scrapper : MonoBehaviour
         }
 
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         uc.Meltdown();
     }
 

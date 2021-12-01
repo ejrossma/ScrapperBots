@@ -72,7 +72,9 @@ public class SystemManager : MonoBehaviour
     public Text bottomCharacterOverviewChargeText;
     public GameObject bottomCharacterOverviewArmorBar;
     public GameObject bottomCharacterOverviewHealthBar;
-    public GameObject bottomCharacterOverviewChargeBar; 
+    public GameObject bottomCharacterOverviewChargeBar;
+
+    public GameObject resultScreen;
 
     private int turnCount;
     private BoardManager bm;
@@ -87,6 +89,7 @@ public class SystemManager : MonoBehaviour
             enemyUnits.Add(g);
         bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
         hereCatchPopup.SetActive(false);
+        resultScreen.SetActive(false);
         GetActiveUnits();
     }
 
@@ -131,7 +134,7 @@ public class SystemManager : MonoBehaviour
                         //THIS NEEDS TO BE TESTED
                             //CURRENTLY BREAKS BECAUSE MESMERIZEDUNIT IS NULL SOMETIMES
                             //ALSO NEED TO RESET MESMERIZEDUNIT AND SELECTUNITTOMESMERIZE AFTER USING ABILITY OR AFTER CANCELLING OUT
-                        else if (activeUnit.GetComponent<Witch>().mesmerizedUnit != null && activeUnit.unitClass == UnitClass.WITCH && activeUnit.GetComponent<Witch>().selectUnitToMesmerize)
+                        else if (activeUnit.unitClass == UnitClass.WITCH && activeUnit.GetComponent<Witch>().mesmerizedUnit != null && activeUnit.GetComponent<Witch>().selectUnitToMesmerize)
                             activeUnit.GetComponent<Witch>().MesmerizeMovement(hit.transform.GetComponentInParent<Tile>());
                         //THIS MIGHT NEED TO BE FIXED BECAUSE IDK IF THE RUINED MACHINE TILES HAVE HITBOXES ON THE MACHINE PART
                         else if (activeUnit.abilityTwoRangeShowing && activeUnit.unitClass == UnitClass.WITCH)
@@ -547,5 +550,59 @@ public class SystemManager : MonoBehaviour
     public void ToggleHelpUI()
     {
         helpUI.SetActive(!helpUI.activeSelf);
+    }
+
+    public void GameOver(bool win)
+    {
+        resultScreen.SetActive(true);
+        Transform panel = resultScreen.transform;
+        // Overall Result
+        panel.GetChild(1).GetComponent<Text>().text = win ? "Victory!" : "Defeat!";
+        // Turns Taken
+        panel.GetChild(3).GetChild(0).GetComponent<Text>().text = "Turns Taken: " + turnCount;
+        // Score
+        panel.GetChild(3).GetChild(1).GetComponent<Text>().text = "Score: " + (win ? "Good" : "Bad");
+        // Allied Units Lost
+        panel.GetChild(4).GetChild(0).GetComponent<Text>().text = "Allied Units Lost: " + DeadAllies();
+        // Enemy Units Destroyed
+        panel.GetChild(4).GetChild(1).GetComponent<Text>().text = "Enemy Units Destroyed: " + DeadEnemies();
+
+        GameObject[] units = GameObject.FindGameObjectsWithTag("Friendly Unit");
+        for(int i = 0; i < 3; i++)
+        {
+            UnitController unit = units[i].GetComponent<UnitController>();
+            // Unit Name
+            panel.GetChild(6 + i).GetChild(0).GetComponent<Text>().text = unit.unitName;
+            // Enemies Destroyed
+            panel.GetChild(6 + i).GetChild(1).GetComponent<Text>().text = "Destroyed: " + unit.destroyed;
+            // Damage Dealt
+            panel.GetChild(6 + i).GetChild(2).GetComponent<Text>().text = "Damage Dealt: " + unit.damageDealt;
+            // Damage Taken
+            panel.GetChild(6 + i).GetChild(3).GetComponent<Text>().text = "Damage Taken: " + unit.damageTaken;
+            // Abilities Used
+            panel.GetChild(6 + i).GetChild(4).GetComponent<Text>().text = "Abilities Used: " + unit.abilitesUsed;
+        }
+    }
+
+    private int DeadAllies()
+    {
+        int count = 0;
+        foreach(GameObject g in deadUnits)
+        {
+            if (g.CompareTag("Friendly Unit"))
+                count++;
+        }
+        return count;
+    }
+
+    private int DeadEnemies()
+    {
+        int count = 0;
+        foreach (GameObject g in deadUnits)
+        {
+            if (g.CompareTag("Enemy Unit"))
+                count++;
+        }
+        return count;
     }
 }

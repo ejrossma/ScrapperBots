@@ -26,6 +26,7 @@ public class BigPal : MonoBehaviour
         uc.SpendCharge(uc, 15);
         InterceptMoveEffect(visited, collideWithAlly);
         uc.actionUsed = true;
+        uc.abilitesUsed++;
     }
 
     public void InterceptMoveEffect(List<Vector2Int> visited, bool collideWithAlly)
@@ -172,6 +173,7 @@ public class BigPal : MonoBehaviour
         TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.LOWER_LEFT));
         TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.UPPER_LEFT));
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         sm.SelectUnit(uc);
     }
 
@@ -235,6 +237,7 @@ public class BigPal : MonoBehaviour
         uc.RecoverCharge(target, target.MAXCRG - target.CRG);
         uc.BuffAttack(target, 20);
         uc.actionUsed = true;
+        uc.abilitesUsed++;
         uc.Meltdown();
     }
 }
