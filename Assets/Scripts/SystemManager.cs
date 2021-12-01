@@ -75,6 +75,10 @@ public class SystemManager : MonoBehaviour
     public GameObject bottomCharacterOverviewChargeBar;
 
     public GameObject resultScreen;
+    public GameObject consoleLog;
+    public GameObject message;
+    public Scrollbar scrollbar;
+    public GameObject consoleLogHideButton;
 
     private int turnCount;
     private BoardManager bm;
@@ -604,5 +608,35 @@ public class SystemManager : MonoBehaviour
                 count++;
         }
         return count;
+    }
+
+    public void LogMessage(string text)
+    {
+        RectTransform rt = consoleLog.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, rt.sizeDelta.y + 40);
+        GameObject msg = Instantiate(message, consoleLog.transform);
+        msg.GetComponent<Text>().text = " > " + text;
+        StartCoroutine(ScrollDown());
+    }
+
+    IEnumerator ScrollDown()
+    {
+        yield return new WaitForEndOfFrame();
+        scrollbar.value = 0;
+    }
+
+    public void SlideLog()
+    {
+        RectTransform rt = consoleLog.GetComponentInParent<ScrollRect>().GetComponent<RectTransform>();
+        if(rt.anchoredPosition.x == 0)
+        {
+            rt.anchoredPosition = new Vector3(-700, -170, 0);
+            consoleLogHideButton.GetComponentInChildren<Text>().text = "Show";
+        }
+        else
+        {
+            rt.anchoredPosition = new Vector3(0, -170, 0);
+            consoleLogHideButton.GetComponentInChildren<Text>().text = "Hide";
+        }
     }
 }

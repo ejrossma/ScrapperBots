@@ -27,6 +27,7 @@ public class Scrapper : MonoBehaviour
         uc.SpendCharge(uc, 40);
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Scrapper used Teardown!");
         transform.rotation = uc.CalculateRotation(bm.GetTile(unit.position));
         ToggleTeardownRange();
         uc.TakeDirectDamage(unit, uc.ATK);
@@ -174,6 +175,7 @@ public class Scrapper : MonoBehaviour
 
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Here, Catch!");
         uc.SpendCharge(uc, 10);
         ToggleHereCatchRange();
         sm.SelectUnit(uc);
@@ -221,6 +223,7 @@ public class Scrapper : MonoBehaviour
 
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Scrapper invoked their meltdown: Last Harvest!");
         uc.Meltdown();
     }
 

@@ -35,6 +35,7 @@ public class Witch : MonoBehaviour
         MesmerizeMoveEffect(tile);
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Witch used Mesmerize!");
         uc.SpendCharge(uc, 20);
         ToggleMesmerizeRange();
         sm.SelectUnit(mesmerizedUnit);
@@ -144,6 +145,7 @@ public class Witch : MonoBehaviour
         ToggleCorpsecallRange();
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Witch used Corpse Call!");
         sm.SelectUnit(uc);
     }
 
@@ -233,7 +235,6 @@ public class Witch : MonoBehaviour
     //meltdown
     public void Necromancy()
     {
-        Debug.Log("Witch has triggered their meltdown and is using Necromancy!");
         List<GameObject> revivableAllies = uc.GetRevivableDeadAllies();
         foreach(GameObject g in revivableAllies)
         {
@@ -241,6 +242,7 @@ public class Witch : MonoBehaviour
         }
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Witch invoked their meltdown: Necromancy!");
         uc.Meltdown();
     }
 }

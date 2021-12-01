@@ -38,14 +38,14 @@ public class Knife : MonoBehaviour
             paths[0].RemoveAt(paths[0].Count - 1);
             if (paths[0].Count > 0)
             {
-                Debug.Log("Knife moving towards target!");
+                //sm.LogMessage("Knife moving towards target!");
                 uc.moving = true;
                 StartCoroutine(KnifeMove(paths[0]));
                 uc.alreadyMoved = true;
             }
             else
             {
-                Debug.Log("Knife didn't move towards target!");
+                //sm.LogMessage("Knife didn't move towards target!");
             }
         }
 
@@ -56,12 +56,12 @@ public class Knife : MonoBehaviour
             List<Transform> targets = uc.GetValidAttackPositions();
             if(targets.Count > 0)
             {
-                Debug.Log("Knife attacked target!");
+                //sm.LogMessage("Knife attacked target!");
                 KnifeAttack(sm.GetUnit(targets[Random.Range(0, targets.Count - 1)].GetComponent<Tile>().position));
                 yield return new WaitForSeconds(1f);
             }
-            else
-                Debug.Log("Knife could not find a target!");
+            //else
+            //    sm.LogMessage("Knife could not find a target!");
         }
 
         // End turn

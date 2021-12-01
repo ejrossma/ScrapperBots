@@ -35,7 +35,7 @@ public class Bomberman : MonoBehaviour
             uc.ATKRNG = temp;
             if (adjacentTargets.Count > 1)
             {
-                Debug.Log("Bomberman commits the ultimate sin!");
+                sm.LogMessage("Bomberman commits the ultimate sin!");
                 BombermanSelfDestruct(adjacentTargets);
                 suicided = true;
             }
@@ -94,12 +94,12 @@ public class Bomberman : MonoBehaviour
                 List<Transform> targets = uc.GetValidAttackPositions();
                 if (targets.Count > 0)
                 {
-                    Debug.Log("Bomberman attacked target!");
+                    //sm.LogMessage("Bomberman attacked target!");
                     BombermanAttack(sm.GetUnit(targets[Random.Range(0, targets.Count - 1)].GetComponent<Tile>().position));
                     yield return new WaitForSeconds(1f);
                 }
-                else
-                    Debug.Log("Bomberman could not find a target!");
+                //else
+                //    sm.LogMessage("Bomberman could not find a target!");
             }
 
             // End turn

@@ -195,11 +195,11 @@ public class UnitController : MonoBehaviour
     {
         if (unit.position == position)
         {
-            Debug.Log(unit.unitName + " has died!");
+            sm.LogMessage(unit.unitName + " has died!");
         }
         else
         {
-            Debug.Log(unitName + " has killed " + unit.unitName + "!");
+            sm.LogMessage(unitName + " has killed " + unit.unitName + "!");
             destroyed++;
         }
         unit.HP = 0;
@@ -224,7 +224,7 @@ public class UnitController : MonoBehaviour
 
     public void Revive(UnitController unit)
     {
-        Debug.Log(unitName + " has revived " + unit.unitName + "!");
+        sm.LogMessage(unitName + " has revived " + unit.unitName + "!");
         unit.HP = 1;
         unit.isDead = false;
         bm.GetTile(unit.position).GetComponent<Tile>().RevertTile();
@@ -245,7 +245,7 @@ public class UnitController : MonoBehaviour
 
     private void LoseHealth(UnitController unit, int damage) 
     {
-        Debug.Log(unit.unitName + " lost " + damage + " health!");
+        //sm.LogMessage(unit.unitName + " lost " + damage + " health!");
         unit.HP -= damage;
         if (unit.HP <= 0)
         {
@@ -256,7 +256,7 @@ public class UnitController : MonoBehaviour
 
     public void RecoveHealth(UnitController unit, int amount)
     {
-        Debug.Log(unit.unitName + " recovered " + amount + " health!");
+        sm.LogMessage(unit.unitName + " recovered " + amount + " health!");
         unit.HP += amount;
         if (unit.HP > unit.MAXHP)
             unit.HP = unit.MAXHP;
@@ -264,31 +264,31 @@ public class UnitController : MonoBehaviour
 
     public void BuffAttack(UnitController unit, int amount)
     {
-        Debug.Log(unit.unitName + " gained " + amount + " attack!");
+        sm.LogMessage(unit.unitName + " gained " + amount + " attack!");
         unit.ATK += amount;
     }
 
     public void TakeDamage(UnitController unit, int damage)
     {
-        Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
+        sm.LogMessage(unitName + " attacked " + unit.unitName + " for " + damage + "!");
         unit.damageTaken += damage;
         damageDealt += damage;
         unit.AMR -= damage;
         if (unit.AMR < 0)
         {
-            Debug.Log(unit.unitName + " lost " + (damage + unit.AMR) + " armor!");
+            //sm.LogMessage(unit.unitName + " lost " + (damage + unit.AMR) + " armor!");
             LoseHealth(unit, -unit.AMR);
             unit.AMR = 0;
         }
         else
         {
-            Debug.Log(unit.unitName + " lost " + damage + " armor!");
+            //sm.LogMessage(unit.unitName + " lost " + damage + " armor!");
         }
     }
 
     public void TakeDirectDamage(UnitController unit, int damage)
     {
-        Debug.Log(unitName + " attacked " + unit.unitName + " for " + damage + "!");
+        sm.LogMessage(unitName + " attacked " + unit.unitName + " for " + damage + "!");
         unit.damageTaken += damage;
         damageDealt += damage;
         LoseHealth(unit, damage);
@@ -296,7 +296,7 @@ public class UnitController : MonoBehaviour
 
     public void RecoverArmor(UnitController unit, int amount)
     {
-        Debug.Log(unit.unitName + " recovered " + amount + " armor!");
+        sm.LogMessage(unit.unitName + " recovered " + amount + " armor!");
         unit.AMR += amount;
         if (unit.AMR > unit.MAXAMR)
             unit.AMR = unit.MAXAMR;
@@ -304,7 +304,7 @@ public class UnitController : MonoBehaviour
 
     public void RecoverCharge(UnitController unit, int amount)
     {
-        Debug.Log(unit.unitName + " recovered " + amount + " charge!");
+        sm.LogMessage(unit.unitName + " recovered " + amount + " charge!");
         unit.CRG += amount;
         if (unit.CRG > unit.MAXCRG)
             unit.CRG = unit.MAXCRG;
@@ -312,7 +312,7 @@ public class UnitController : MonoBehaviour
 
     public void SpendCharge(UnitController unit, int amount)
     {
-        Debug.Log(unit.unitName + " spent " + amount + " charge!");
+        sm.LogMessage(unit.unitName + " spent " + amount + " charge!");
         unit.CRG -= amount;
     }
 
@@ -426,7 +426,7 @@ public class UnitController : MonoBehaviour
         else if (targetTile.y > currentTile.y && targetTile.x < currentTile.x)
             return Direction.UPPER_LEFT;
 
-        Debug.Log("Direction not found!");
+        sm.LogMessage("Direction not found!");
         return Direction.ABOVE;
     }
 
@@ -934,8 +934,9 @@ public class UnitController : MonoBehaviour
 
         foreach(GameObject g in sm.deadUnits)
         {
-            Transform tile = bm.GetTile(g.GetComponent<UnitController>().position);
-            if (tile != null && tile.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE)
+            UnitController unit = g.GetComponent<UnitController>();
+            Transform tile = bm.GetTile(unit.position);
+            if (tile != null && tile.GetComponent<Tile>().tileType == TileType.RUINED_MACHINE && unit.CompareTag("Friendly Unit"))
                 allies.Add(g);
         }
         return allies;

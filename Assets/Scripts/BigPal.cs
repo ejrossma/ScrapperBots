@@ -27,6 +27,7 @@ public class BigPal : MonoBehaviour
         InterceptMoveEffect(visited, collideWithAlly);
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Big Pal used Intercept!");
     }
 
     public void InterceptMoveEffect(List<Vector2Int> visited, bool collideWithAlly)
@@ -174,6 +175,7 @@ public class BigPal : MonoBehaviour
         TheBestDefenseEffect(bm.GetAdjacentTile(uc.position, Direction.UPPER_LEFT));
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Big Pal used The Best Defense!");
         sm.SelectUnit(uc);
     }
 
@@ -238,6 +240,7 @@ public class BigPal : MonoBehaviour
         uc.BuffAttack(target, 20);
         uc.actionUsed = true;
         uc.abilitesUsed++;
+        sm.LogMessage("Big Pal invoked their meltdown: Sacrifice!");
         uc.Meltdown();
     }
 }
