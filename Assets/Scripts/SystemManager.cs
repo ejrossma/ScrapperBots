@@ -486,7 +486,8 @@ public class SystemManager : MonoBehaviour
     public void UpdateCharacterOverview() 
     {
         int count = 1;
-        foreach (GameObject g in friendlyUnits) {
+        GameObject[] list = GameObject.FindGameObjectsWithTag("Friendly Unit");
+        foreach (GameObject g in list) {
             UpdateCharacterOverviewStats(g.GetComponent<UnitController>(), count);
             count++;
         }

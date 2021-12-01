@@ -196,8 +196,8 @@ public class UnitController : MonoBehaviour
 
     public void Meltdown()
     {
-        Die(this);
         EndTurn();
+        Die(this);
     }
 
     public void Die(UnitController unit)
@@ -229,6 +229,7 @@ public class UnitController : MonoBehaviour
         }
         unit.transform.GetChild(0).gameObject.SetActive(false);
         GameOverCheck();
+        sm.UpdateCharacterOverview();
     }
 
     public void Revive(UnitController unit)
