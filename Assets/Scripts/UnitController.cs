@@ -44,6 +44,12 @@ public class UnitController : MonoBehaviour
     private BoardManager bm;
     private SystemManager sm;
 
+    private void Awake()
+    {
+        bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
+        sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
+    }
+
     private void Start()
     {
         //need to change so it goes on and off when the actions are playing out
@@ -52,8 +58,7 @@ public class UnitController : MonoBehaviour
         //interpolation rate for movement of units
         travelTime = 0.0f;
         waitTime = 0.5f;
-        bm = GameObject.FindGameObjectWithTag("Board").GetComponent<BoardManager>();
-        sm = GameObject.FindGameObjectWithTag("System Manager").GetComponent<SystemManager>();
+        
         MoveToTile(position);
     }
 
@@ -354,21 +359,37 @@ public class UnitController : MonoBehaviour
             //lower right (120 degrees)
 
         float rotValue = 0.0f;
-        Vector2Int t = tile.GetComponent<Tile>().position;
-        if ((position.x % 2 != 0 && position.x > t.x && position.y < t.y) || (position.x % 2 == 0 && position.x > t.x && position.y == t.y)) //upper left
-            rotValue = 300.0f;
-        else if ((position.x % 2 != 0 && position.x > t.x && position.y == t.y) || (position.x % 2 == 0 && position.x > t.x && position.y > t.y))  //lower left
-            rotValue = 240.0f;
-        else if (position.x == t.x && position.y < t.y)  //forward
-            rotValue = 0.0f;
-        else if (position.x == t.x && position.y > t.y)  //backward
-            rotValue = 180.0f;
-        else if ((position.x % 2 != 0 && position.x < t.x && position.y < t.y) || (position.x % 2 == 0 && position.x < t.x && position.y == t.y))  //upper right
-            rotValue = 60.0f;
-        else if ((position.x % 2 != 0 && position.x < t.x && position.y == t.y) || (position.x % 2 == 0 && position.x < t.x && position.y > t.y))  //lower right
-            rotValue = 120.0f;
+        //Vector2Int t = tile.GetComponent<Tile>().position;
+        //if ((position.x % 2 != 0 && position.x > t.x && position.y < t.y) || (position.x % 2 == 0 && position.x > t.x && position.y == t.y)) //upper left
+        //    rotValue = 300.0f;
+        //else if ((position.x % 2 != 0 && position.x > t.x && position.y == t.y) || (position.x % 2 == 0 && position.x > t.x && position.y > t.y))  //lower left
+        //    rotValue = 240.0f;
+        //else if (position.x == t.x && position.y < t.y)  //forward
+        //    rotValue = 0.0f;
+        //else if (position.x == t.x && position.y > t.y)  //backward
+        //    rotValue = 180.0f;
+        //else if ((position.x % 2 != 0 && position.x < t.x && position.y < t.y) || (position.x % 2 == 0 && position.x < t.x && position.y == t.y))  //upper right
+        //    rotValue = 60.0f;
+        //else if ((position.x % 2 != 0 && position.x < t.x && position.y == t.y) || (position.x % 2 == 0 && position.x < t.x && position.y > t.y))  //lower right
+        //    rotValue = 120.0f;
 
-        if(CompareTag("Friendly Unit"))
+        Vector3Int currentTile = bm.GetTile(position).GetComponent<Tile>().nodePosition;
+        Vector3Int targetTile = tile.GetComponent<Tile>().nodePosition;
+
+        if (targetTile.y > currentTile.y && targetTile.z < currentTile.z)
+            rotValue = 0.0f;
+        else if (targetTile.x > currentTile.x && targetTile.z < currentTile.z)
+            rotValue = 60.0f;
+        else if (targetTile.x > currentTile.x && targetTile.y < currentTile.y)
+            rotValue = 120.0f;
+        else if (targetTile.z > currentTile.z && targetTile.y < currentTile.y)
+            rotValue = 180.0f;
+        else if (targetTile.z > currentTile.z && targetTile.x < currentTile.x)
+            rotValue = 240.0f;
+        else if (targetTile.y > currentTile.y && targetTile.x < currentTile.x)
+            rotValue = 300.0f;
+
+        if (CompareTag("Friendly Unit"))
             return Quaternion.Euler(0, rotValue, 0);
         return Quaternion.Euler(0, rotValue - 180, 0);
     }

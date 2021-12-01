@@ -281,7 +281,7 @@ public class SystemManager : MonoBehaviour
         UpdateCharacterOverview();
         Camera.main.GetComponent<CameraManager>().PanToDestination(new Vector3(unit.gameObject.transform.position.x, 10, unit.gameObject.transform.position.z - 4.5f));
         // Activate turn UI on unit's turn, otherwise deactivate turn UI
-        if (unit.isTurn && !unit.moving && !unit.acting)
+        if (unit.isTurn && !unit.moving && !unit.acting && unit.CompareTag("Friendly Unit"))
         {
             //move button
             moveButton.GetComponent<Button>().interactable = !unit.alreadyMoved;
