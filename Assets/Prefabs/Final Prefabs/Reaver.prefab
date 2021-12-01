@@ -726,7 +726,9 @@ MonoBehaviour:
   CRG: 20
   MAXCRG: 20
   SPD: 6
+  BaseSPD: 6
   TRD: 4
+  BaseTRD: 4
   ATKRNG: 1
   position: {x: 5, y: 3}
   isTurn: 0
@@ -744,6 +746,10 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: a8f535cf7dbc64cb280d8129de31040a, type: 3}
   isDead: 0
   isMesmerized: 0
+  destroyed: 0
+  damageDealt: 0
+  damageTaken: 0
+  abilitesUsed: 0
   travelTime: 0
   waitTime: 0
 --- !u!114 &2249139284105199201

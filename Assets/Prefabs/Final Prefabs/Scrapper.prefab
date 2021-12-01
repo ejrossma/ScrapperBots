@@ -56,7 +56,9 @@ MonoBehaviour:
   CRG: 50
   MAXCRG: 50
   SPD: 5
+  BaseSPD: 5
   TRD: 5
+  BaseTRD: 5
   ATKRNG: 1
   position: {x: 5, y: 0}
   isTurn: 0
@@ -68,9 +70,16 @@ MonoBehaviour:
   moveRangeShowing: 0
   abilityOneRangeShowing: 0
   abilityTwoRangeShowing: 0
+  meltdownRangeShowing: 0
   attackRangeShowing: 0
+  harvestRangeShowing: 0
   icon: {fileID: 21300000, guid: 5722346b4f35a4d0db449517ffdb10ef, type: 3}
   isDead: 0
+  isMesmerized: 0
+  destroyed: 0
+  damageDealt: 0
+  damageTaken: 0
+  abilitesUsed: 0
   travelTime: 0
   waitTime: 0
 --- !u!114 &-8288318405881235713
@@ -85,6 +94,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97d2443f3938d374d97dde33e15b0d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hereCatchPhase: 0
+  hereCatchTile: {fileID: 0}
 --- !u!64 &4355008483803084713
 MeshCollider:
   m_ObjectHideFlags: 0

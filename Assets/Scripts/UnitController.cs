@@ -17,7 +17,9 @@ public class UnitController : MonoBehaviour
     public int CRG; //charge
     public int MAXCRG;
     public int SPD; //speed
+    public int BaseSPD;
     public int TRD; //threads
+    public int BaseTRD;
     public int ATKRNG; //attack range
     public Vector2Int position;
     public bool isTurn;
@@ -104,6 +106,13 @@ public class UnitController : MonoBehaviour
 
     public void EndTurn()
     {
+        switch (bm.GetTile(position).GetComponent<Tile>().tileType)
+        {
+            case TileType.WATER: TRD = BaseTRD - 2; break;
+            case TileType.CHARGED_AIR: TRD = BaseTRD + 2; break;
+            case TileType.MUD: SPD = BaseSPD - 1; break;
+            default: TRD = BaseTRD; SPD = BaseSPD; break;
+        }
         isTurn = false;
         sm.AdvanceTurnOrder();
         bm.DeselectTiles();
@@ -753,7 +762,6 @@ public class UnitController : MonoBehaviour
         CheckForAdjacent(visited, (Vector3Int)position, Direction.LOWER_LEFT);
         CheckForAdjacent(visited, (Vector3Int)position, Direction.UPPER_RIGHT);
         CheckForAdjacent(visited, (Vector3Int)position, Direction.LOWER_RIGHT);
-
         List<Transform> tiles = new List<Transform>();
 
         foreach (Vector3Int v in visited)
@@ -768,18 +776,21 @@ public class UnitController : MonoBehaviour
     private void CheckForAdjacent(List<Vector3Int> visited, Vector3Int node, Direction dir)
     {
         if (node.z == ATKRNG + 1)
+        {
             return;
+        }
 
         if (TileOccupied(bm.GetTile((Vector2Int)node)))
         {
             visited.Add(node);
-            return;
         }
         Transform temp = bm.GetAdjacentTile((Vector2Int)node, dir);
         if (temp == null || !bm.TileIsMovable(temp))
+        {
             return;
+        }
         Vector2Int temp2 = temp.GetComponent<Tile>().position;
-        CheckForAttack(visited, new Vector3Int(temp2.x, temp2.y, node.z + 1), dir);
+        CheckForAdjacent(visited, new Vector3Int(temp2.x, temp2.y, node.z + 1), dir);
     }
 
     // Algorithm derived from Michal Magdziarz's website https://blog.theknightsofunity.com/pathfinding-on-a-hexagonal-grid-a-algorithm/
