@@ -50,6 +50,7 @@ public class SystemManager : MonoBehaviour
     public GameObject showCharacterOverview;
     public GameObject hideCharacterOverview;
 
+    public Text topCharacterOverviewNameText;
     public Text topCharacterOverviewArmorText;
     public Text topCharacterOverviewHealthText;
     public Text topCharacterOverviewChargeText;
@@ -57,6 +58,7 @@ public class SystemManager : MonoBehaviour
     public GameObject topCharacterOverviewHealthBar;
     public GameObject topCharacterOverviewChargeBar;
 
+    public Text middleCharacterOverviewNameText;
     public Text middleCharacterOverviewArmorText;
     public Text middleCharacterOverviewHealthText;
     public Text middleCharacterOverviewChargeText;
@@ -64,6 +66,7 @@ public class SystemManager : MonoBehaviour
     public GameObject middleCharacterOverviewHealthBar;
     public GameObject middleCharacterOverviewChargeBar;    
 
+    public Text bottomCharacterOverviewNameText;
     public Text bottomCharacterOverviewArmorText;
     public Text bottomCharacterOverviewHealthText;
     public Text bottomCharacterOverviewChargeText;
@@ -305,10 +308,12 @@ public class SystemManager : MonoBehaviour
             {
                 maintainActionButton.GetComponent<Button>().onClick.AddListener(() => UnitHoldAction(unit.gameObject));
                 maintainActionButton.GetComponentInChildren<Text>().text = "Hold Action (Can only be used once)";
+                maintainActionButton.tag = "Hold Action";
             }
             else
             {
                 maintainActionButton.GetComponentInChildren<Text>().text = "End Turn";
+                maintainActionButton.tag = "End Turn";
             }
             maintainActionButton.GetComponent<Button>().onClick.AddListener(() => unit.EndTurn());
 
@@ -354,18 +359,21 @@ public class SystemManager : MonoBehaviour
         {
             case UnitClass.BIG_PAL:
                 ability1Button.GetComponentInChildren<Text>().text = "Intercept";
+                ability1Button.tag = "Intercept";
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleInterceptRange()); //ability call here
                 // Set false if not enough resource to use
                 if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 15 || unit.GetComponent<BigPal>().GetValidInterceptionRange().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "The Best Defense";
+                ability2Button.tag = "The Best Defense";
                 ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().TheBestDefense()); //ability call here
                 // Set false if not enough resource to use
                 if (ability2Button.GetComponent<Button>().interactable && (unit.AMR < 40 || unit.GetValidAdjacentUnits().Count == 0))
                     ability2Button.GetComponent<Button>().interactable = false;
 
                 overloadButton.GetComponentInChildren<Text>().text = "Sacrifice (Meltdown)";
+                overloadButton.tag = "Sacrifice";
                 overloadButton.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<BigPal>().ToggleSacrificeRange()); //ability call here
                 if (overloadButton.GetComponent<Button>().interactable && !unit.AreAliveAllies())
                     overloadButton.GetComponent<Button>().interactable = false;
@@ -373,18 +381,21 @@ public class SystemManager : MonoBehaviour
 
             case UnitClass.SCRAPPER:
                 ability1Button.GetComponentInChildren<Text>().text = "Teardown"; //ability name needed
+                ability1Button.tag = "Teardown";
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleTeardownRange()); //ability call here
                 // Set false if not enough resource to use
                 if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 40 || unit.GetValidAttackPositions().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "Here, Catch!";
+                ability2Button.tag = "Here, Catch!";
                 ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleHereCatchRange()); //ability call here
                 // Set false if not enough resource to use
                 if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetValidHarvestPositions().Count == 0 || unit.GetComponent<Scrapper>().GetValidHereCatchPositions().Count == 0))
                     ability2Button.GetComponent<Button>().interactable = false;
 
                 overloadButton.GetComponentInChildren<Text>().text = "Last Harvest (Meltdown)";
+                overloadButton.tag = "Last Harvest";
                 overloadButton.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Scrapper>().ToggleLastHarvestRange()); //ability call here
                 if (overloadButton.GetComponent<Button>().interactable && unit.GetValidAttackPositions().Count == 0)
                     overloadButton.GetComponent<Button>().interactable = false;
@@ -392,18 +403,21 @@ public class SystemManager : MonoBehaviour
 
             case UnitClass.WITCH:
                 ability1Button.GetComponentInChildren<Text>().text = "Mesmerize";
+                ability1Button.tag = "Mesmerize";
                 ability1Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleMesmerizeRange()); //ability call here
                 //Set false if not enough resource to use
                 if (ability1Button.GetComponent<Button>().interactable && (unit.CRG < 20 || unit.GetComponent<Witch>().GetValidMesmerizeRange().Count == 0))
                     ability1Button.GetComponent<Button>().interactable = false;
 
                 ability2Button.GetComponentInChildren<Text>().text = "Corpsecall";
+                ability2Button.tag = "Corpsecall";
                 ability2Button.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().ToggleCorpsecallRange()); //ability call here
                 // Set false if not enough resource to use
                 if (ability2Button.GetComponent<Button>().interactable && (unit.CRG < 10 || unit.GetComponent<Witch>().GetValidCorpsecallRange().Count == 0))
                     ability2Button.GetComponent<Button>().interactable = false;
 
                 overloadButton.GetComponentInChildren<Text>().text = "Necromancy (Meltdown)";
+                overloadButton.tag = "Necromancy";
                 overloadButton.GetComponent<Button>().onClick.AddListener(() => unit.GetComponent<Witch>().Necromancy()); //ability call here
                 if (overloadButton.GetComponent<Button>().interactable && unit.GetRevivableDeadAllies().Count == 0)
                     overloadButton.GetComponent<Button>().interactable = false;
@@ -458,8 +472,8 @@ public class SystemManager : MonoBehaviour
         displayMovement.text = "Movement: " + unit.SPD;
         displayThreads.text = "Threads: " + unit.TRD;
         displayAttack.text = "Attack: " + unit.ATK;
-        displayBuffs.text = "Buffs:";
-        displayDebuffs.text = "Debuffs:";
+        displayBuffs.text = "Attack Range: " + unit.ATKRNG;
+        //displayDebuffs.text = "Debuffs:";
     }
 
     public void UpdateCharacterOverview() 
@@ -476,6 +490,7 @@ public class SystemManager : MonoBehaviour
         if (count == 1)
         {
             //top of 3
+            topCharacterOverviewNameText.text = uc.unitName;
             topCharacterOverviewArmorText.text = uc.AMR + "/" + uc.MAXAMR;
             topCharacterOverviewHealthText.text = uc.HP + "/" + uc.MAXHP;
             topCharacterOverviewChargeText.text = uc.CRG + "/" + uc.MAXCRG;
@@ -487,6 +502,7 @@ public class SystemManager : MonoBehaviour
         else if (count == 2)
         {
             //middle of 3
+            middleCharacterOverviewNameText.text = uc.unitName;
             middleCharacterOverviewArmorText.text = uc.AMR + "/" + uc.MAXAMR;
             middleCharacterOverviewHealthText.text = uc.HP + "/" + uc.MAXHP;
             middleCharacterOverviewChargeText.text = uc.CRG + "/" + uc.MAXCRG;
@@ -498,6 +514,7 @@ public class SystemManager : MonoBehaviour
         else if (count == 3)
         {
             //bottom of 3
+            bottomCharacterOverviewNameText.text = uc.unitName;
             bottomCharacterOverviewArmorText.text = uc.AMR + "/" + uc.MAXAMR;
             bottomCharacterOverviewHealthText.text = uc.HP + "/" + uc.MAXHP;
             bottomCharacterOverviewChargeText.text = uc.CRG + "/" + uc.MAXCRG;

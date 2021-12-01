@@ -8,6 +8,29 @@ TagManager:
   - Friendly Unit
   - Enemy Unit
   - System Manager
+  - Health
+  - Armor
+  - Charge
+  - Speed
+  - Threads
+  - Move
+  - Attack
+  - Hold Action
+  - Abilities
+  - Harvest
+  - Intercept
+  - The Best Defense
+  - Teardown
+  - Here, Catch!
+  - Mesmerize
+  - Corpsecall
+  - Sacrifice
+  - Necromancy
+  - Last Harvest
+  - Attack Range
+  - Attack Value
+  - Tooltip Anchor
+  - End Turn
   layers:
   - Default
   - TransparentFX

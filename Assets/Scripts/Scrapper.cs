@@ -31,7 +31,7 @@ public class Scrapper : MonoBehaviour
         uc.TakeDirectDamage(unit, uc.ATK);
         StopCoroutine(ResetRotationAfterAttack());
         StartCoroutine(ResetRotationAfterAttack());
-        sm.SelectUnit(unit);
+        sm.SelectUnit(uc);
         if (unit.isDead)
         {
             sm.hereCatchPopup.SetActive(true);
