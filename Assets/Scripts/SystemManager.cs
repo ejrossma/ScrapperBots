@@ -630,7 +630,7 @@ public class SystemManager : MonoBehaviour
         RectTransform rt = consoleLog.GetComponentInParent<ScrollRect>().GetComponent<RectTransform>();
         if(rt.anchoredPosition.x == 0)
         {
-            rt.anchoredPosition = new Vector3(-700, -170, 0);
+            rt.anchoredPosition = new Vector3(-800, -170, 0);
             consoleLogHideButton.GetComponentInChildren<Text>().text = "Show";
         }
         else

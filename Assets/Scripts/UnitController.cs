@@ -196,8 +196,8 @@ public class UnitController : MonoBehaviour
 
     public void Meltdown()
     {
-        EndTurn();
         Die(this);
+        EndTurn();
     }
 
     public void Die(UnitController unit)
